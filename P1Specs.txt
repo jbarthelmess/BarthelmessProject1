@@ -1,0 +1,46 @@
+Project 1
+You are task with making a full stack web application.
+
+You are creating an Expense Reimbursement system. This system has two main types of users.
+Employees and managers. The application should follow RESTful conventions for its resources.
+You should give the application a fun theme. Batman, Mushroom Kingdom, Harry Potter etc...
+
+user stories:
+- Employees should be able to login.
+- Employees can submit expenses.
+- Every every expense should have an amount and a reason, status, date submitted, and date approved/denied.
+- valid expense statuses are "pending", "approved", "denied"
+- Employees can see the status of any of their own reimbursements past and present.
+
+- Managers should be able to login
+- Managers can view all employees reimbursements
+- Managers can approve or deny reimbursements.
+- When approving or denying managers can optionally add a reason why
+
+you do not need to be able to create new employees or managers. You can assume another application does that.
+You can add employees/managers directly to the database
+
+bonus features: do after achieving the base user stories
+- Employees can attach a file to the expenditure like a jpeg receipt
+- There is a manager statistics page that allows a manager to see
+    - Total reimbursements approved, denied and %
+    - Total amount reimbursed
+- Managers can sort reimbursements by employee, date submitted and status
+
+Security Requirements
+- After login a user should be given a JWT which details their permissions
+- Manager JWTs should give complete access
+- Employee JWTs should not give them access to anything other than their own reimbursements
+- All logins should be logged
+- SQL injections should be prevented via prepared statements
+- Any sensitive connection information is stored via environment variables
+
+Testing Requirements:
+- All DAO methods should be tested
+- All service methods should be tested
+- Mockito should be used where appropriate
+
+Deployment Requirements:
+- The application should be packaged as an executable jar run on a GCP virtual machine
+- The database should be a postgres DB on GCP
+- Your final project should be in a github repository
