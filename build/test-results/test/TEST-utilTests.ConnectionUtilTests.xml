@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="utilTests.ConnectionUtilTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-02-26T21:35:36" hostname="DESKTOP-T6NR4LV" time="0.557">
+  <properties/>
+  <testcase name="generate_connection()" classname="utilTests.ConnectionUtilTests" time="0.557"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

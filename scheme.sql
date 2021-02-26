@@ -1,6 +1,6 @@
 create type resolve_status as enum ('pending', 'denied', 'approved');
 
-create table user (
+create table users (
     user_id int primary key generated always as identity,
     username varchar(256) not null unique,
     password varchar(256) not null, -- ought to be a hash of it or something, no passwords stored directly in the db
@@ -19,5 +19,5 @@ create table expense (
     status resolve_status not null
 );
 
-alter table expense add foreign key (user_id) references user(user_id);
-alter table expense add foreign key (user_id) references user(user_id);
+alter table expense add foreign key (user_id) references users(user_id);
+alter table expense add foreign key (user_id) references users(user_id);
