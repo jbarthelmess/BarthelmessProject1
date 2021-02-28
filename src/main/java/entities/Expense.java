@@ -1,6 +1,7 @@
 package entities;
 
 public class Expense {
+    private int expenseId;
     private int userId;
     private int amountInCents;
     private String reasonSubmitted;
@@ -11,6 +12,7 @@ public class Expense {
     private String fileURL;
 
     public Expense() {
+        this.expenseId = 0;
         this.userId = 0;
         this.amountInCents = -1;
         this.dateSubmitted = -1;
@@ -19,6 +21,17 @@ public class Expense {
         this.reasonResolved = null;
         this.status = null;
         this.fileURL = null;
+    }
+
+    public int getExpenseId() {
+        return expenseId;
+    }
+
+    public void setExpenseId(int expenseId) {
+        if(expenseId <= 0) {
+            throw new IllegalArgumentException("Expense ID cannot be less than or equal to zero");
+        }
+        this.expenseId = expenseId;
     }
 
     public int getUserId() {
@@ -91,8 +104,33 @@ public class Expense {
         return status;
     }
 
+    public String getStatusAsString() {
+        switch (this.status) {
+            case PENDING: return "pending";
+            case APPROVED: return "approved";
+            case DENIED: return "denied";
+        }
+        return null;
+    }
+
     public void setStatus(ExpenseStatus status) {
         this.status = status;
+    }
+
+    public void setStatusFromString(String status) {
+        switch(status) {
+            case "pending":
+                this.status = ExpenseStatus.PENDING;
+                break;
+            case "approved":
+                this.status = ExpenseStatus.APPROVED;
+                break;
+            case "denied":
+                this.status = ExpenseStatus.DENIED;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid status string provided");
+        }
     }
 
     public String getFileURL() {

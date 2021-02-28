@@ -10,7 +10,7 @@ public interface ReimbursementDAO {
     Expense createExpense(Expense expense);
 
     // Read
-    User getUser(String username);
+    User getUser(User user);
     Expense getExpense(int expenseId);
     HashSet<Expense> getAllExpenses();
 
