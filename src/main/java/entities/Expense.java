@@ -3,6 +3,7 @@ package entities;
 public class Expense {
     private int expenseId;
     private int userId;
+    private int managerHandler;
     private int amountInCents;
     private String reasonSubmitted;
     private String reasonResolved;
@@ -16,10 +17,10 @@ public class Expense {
         this.userId = 0;
         this.amountInCents = -1;
         this.dateSubmitted = -1;
-        this.dateResolved = -2;
+        this.dateResolved = 0;
         this.reasonSubmitted = null;
         this.reasonResolved = null;
-        this.status = null;
+        this.status = ExpenseStatus.PENDING;
         this.fileURL = null;
     }
 
@@ -94,8 +95,8 @@ public class Expense {
     }
 
     public void setDateResolved(long dateResolved) {
-        if(dateResolved < this.dateSubmitted) {
-            throw new IllegalArgumentException("Date resolved cannot be before date submitted");
+        if(dateResolved < this.dateSubmitted && dateResolved != 0) {
+            throw new IllegalArgumentException("Date resolved of "+ dateResolved+" cannot be before date submitted of "+this.dateSubmitted);
         }
         this.dateResolved = dateResolved;
     }
@@ -105,12 +106,7 @@ public class Expense {
     }
 
     public String getStatusAsString() {
-        switch (this.status) {
-            case PENDING: return "pending";
-            case APPROVED: return "approved";
-            case DENIED: return "denied";
-        }
-        return null;
+        return this.status.name();
     }
 
     public void setStatus(ExpenseStatus status) {
@@ -119,13 +115,13 @@ public class Expense {
 
     public void setStatusFromString(String status) {
         switch(status) {
-            case "pending":
+            case "PENDING":
                 this.status = ExpenseStatus.PENDING;
                 break;
-            case "approved":
+            case "APPROVED":
                 this.status = ExpenseStatus.APPROVED;
                 break;
-            case "denied":
+            case "DENIED":
                 this.status = ExpenseStatus.DENIED;
                 break;
             default:
@@ -139,5 +135,13 @@ public class Expense {
 
     public void setFileURL(String fileURL) {
         this.fileURL = fileURL;
+    }
+
+    public int getManagerHandler() {
+        return managerHandler;
+    }
+
+    public void setManagerHandler(int managerHandler) {
+        this.managerHandler = managerHandler;
     }
 }

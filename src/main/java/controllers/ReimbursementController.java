@@ -8,7 +8,7 @@ import services.ReimbursementService;
 import utils.JwtUtil;
 
 public class ReimbursementController {
-    private ReimbursementService reimbursementService;
+    private final ReimbursementService reimbursementService;
     private final Gson gson = new Gson();
 
     public ReimbursementController(ReimbursementService reimbursementService) {
