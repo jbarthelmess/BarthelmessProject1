@@ -7,7 +7,7 @@ import entities.User;
 import java.util.HashSet;
 
 public interface ReimbursementService {
-    boolean login(LoginAttempt loginAttempt);
+    User login(LoginAttempt loginAttempt);
     User getUser(User user);
     Expense getExpense(User user, int expenseId) throws IllegalAccessException;
     HashSet<Expense> getAllExpenses(User user) throws IllegalAccessException;

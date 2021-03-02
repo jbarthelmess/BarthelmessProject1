@@ -1,6 +1,7 @@
 package daos;
 
 import entities.Expense;
+import entities.LoginAttempt;
 import entities.User;
 
 import java.util.HashSet;
@@ -13,6 +14,7 @@ public interface ReimbursementDAO {
     User getUser(User user);
     Expense getExpense(int expenseId);
     HashSet<Expense> getAllExpenses();
+    User checkLogin(LoginAttempt loginAttempt);
 
     // Update
     Expense updateExpense(Expense expense);

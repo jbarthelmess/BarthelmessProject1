@@ -4,3 +4,5 @@ daoTests/ReimbursementDaoTests.java
  daoTests.ReimbursementDaoTests
 serviceTests/ReimbursementServiceTests.java
  serviceTests.ReimbursementServiceTests
+utilTests/JwtUtilTests.java
+ utilTests.JwtUtilTests

@@ -2,6 +2,7 @@ package services;
 
 import daos.ReimbursementDAO;
 import entities.Expense;
+import entities.ExpenseStatus;
 import entities.LoginAttempt;
 import entities.User;
 import org.apache.log4j.Logger;
@@ -46,22 +47,57 @@ public class ReimbursementServiceImpl implements ReimbursementService{
 
     @Override
     public Expense createExpense(User user, Expense expense) {
+        expense.setDateSubmitted(System.currentTimeMillis()/1000L);
         expense.setUserId(user.getUserId());
+        if(expense.getAmountInCents()<=0) throw new IllegalArgumentException("Amount should not be less than or equal to zero");
+        if(expense.getReasonSubmitted() == null || expense.getReasonSubmitted().equals(""))
+            throw new IllegalArgumentException("Reason should not be empty or null");
+        if(expense.getFileURL() != null && expense.getFileURL().equals("")) expense.setFileURL(null);
         return dao.createExpense(expense);
     }
 
     @Override
     public Expense updateExpense(User user, Expense expense) throws IllegalAccessException{
         Expense e = dao.getExpense(expense.getExpenseId());
-        if(user.isManager() || user.getUserId() == e.getUserId()) {
+        if(e == null){
+            logger.warn("User "+ user.getUsername() + " attempted to update non-existent expense "+ expense.getExpenseId()+".");
+            throw new NullPointerException("Could not find expense");
+        }
+
+        // first, prevent people from updating a completed reimbursement request
+        if(e.getStatus() != ExpenseStatus.PENDING) {
+            logger.warn("User "+ user.getUsername() + " attempted to illegally update expense "+ expense.getExpenseId()+".");
+            throw new IllegalAccessException("Cannot update a completed expense");
+        }
+
+        // next enforce what can be done by non-managers
+        if(!user.isManager()) {
+            // Non-managers cannot update other people's expenses
+            if(user.getUserId() != e.getUserId()) {
+                logger.warn("User "+ user.getUsername() + " attempted to illegally update expense "+ expense.getExpenseId()+".");
+                throw new IllegalAccessException("User is not permitted to update the indicated expense");
+            }
+            // set parameters that non-managers cannot change
+            expense.setStatus(ExpenseStatus.PENDING);
+            expense.setManagerHandler(0);
+            expense.setReasonResolved(null);
+            expense.setDateResolved(0);
             return dao.updateExpense(expense);
         }
-        logger.warn("User "+ user.getUsername() + " attempted to illegally update expense "+ expense.getExpenseId()+".");
-        throw new IllegalAccessException("User is not permitted to update the indicated expense");
+        expense.setDateResolved(System.currentTimeMillis()/1000L);
+        expense.setManagerHandler(user.getUserId());
+        // finally perform some checking from the manager side
+        if(expense.getStatus() == ExpenseStatus.PENDING) {
+            // if the manager is not resolving the expense, maintain these parameters as is
+            expense.setManagerHandler(0);
+            expense.setReasonResolved(null);
+            expense.setDateResolved(0);
+        }
+        return dao.updateExpense(expense);
     }
 
     @Override
-    public boolean login(LoginAttempt loginAttempt) {
-        return false;
+    public User login(LoginAttempt loginAttempt) {
+        return dao.checkLogin(loginAttempt);
     }
 }

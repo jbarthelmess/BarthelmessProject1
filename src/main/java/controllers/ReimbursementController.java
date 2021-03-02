@@ -33,7 +33,7 @@ public class ReimbursementController {
             return null;
         }
         User user = new User();
-        user.setUserId(jwt.getClaim("userID").asInt());
+        user.setUserId(jwt.getClaim("userId").asInt());
         user.setUsername(jwt.getClaim("username").asString());
         user.setManager(jwt.getClaim("isManager").asBoolean());
         return user;
@@ -64,14 +64,20 @@ public class ReimbursementController {
             return;
         }
         Expense expense = gson.fromJson(ctx.body(), Expense.class);
-        Expense createdExpense = service.createExpense(user, expense);
-        if(createdExpense == null) {
-            ctx.status(500);
-            ctx.result("Could not create expense");
-            return;
+        try {
+            Expense createdExpense = service.createExpense(user, expense);
+            if (createdExpense == null) {
+                ctx.status(500);
+                ctx.result("Could not create expense");
+                return;
+            }
+            ctx.status(201);
+            ctx.result(gson.toJson(createdExpense));
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+            ctx.status(400);
+            ctx.result(e.getMessage());
         }
-        ctx.status(201);
-        ctx.result(gson.toJson(createdExpense));
     };
 
     public Handler getExpense = (ctx) -> {
@@ -152,6 +158,16 @@ public class ReimbursementController {
 
     public Handler getUserLogin = (ctx) -> {
         LoginAttempt login = gson.fromJson(ctx.body(), LoginAttempt.class);
-
+        User user = service.login(login);
+        if(user == null) {
+            ctx.status(403);
+            ctx.result("Login failed");
+            logger.warn("Failed attempted login with username: "+login.getUsername());
+            return;
+        }
+        String jwt = JwtUtil.generate(user);
+        ctx.status(200);
+        ctx.result(jwt);
+        logger.info("Login for user "+login.getUsername());
     };
 }

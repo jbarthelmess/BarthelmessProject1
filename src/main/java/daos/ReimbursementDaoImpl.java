@@ -1,6 +1,7 @@
 package daos;
 
 import entities.Expense;
+import entities.LoginAttempt;
 import entities.User;
 import org.apache.log4j.Logger;
 import utils.ConnectionUtil;
@@ -143,6 +144,26 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
             ps.setInt(8, expense.getExpenseId());
             int success = ps.executeUpdate();
             return success > 0? expense: null;
+        } catch (SQLException s) {
+            logger.error(s.getMessage());
+            return null;
+        }
+    }
+
+    public User checkLogin(LoginAttempt loginAttempt) {
+        try (Connection conn = ConnectionUtil.createConnection()) {
+            String query = "select username, user_id, is_manager from users where username = ? and pass_word = ?";
+            // check username and password combo, should return zero rows if either is wrong
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setString(1, loginAttempt.getUsername());
+            ps.setString(2, loginAttempt.getPassword());
+            ResultSet rs = ps.executeQuery();
+            if(!rs.next()) return null;
+            User user = new User();
+            user.setUsername(rs.getString("username"));
+            user.setUserId(rs.getInt("user_id"));
+            user.setManager(rs.getBoolean("is_manager"));
+            return user;
         } catch (SQLException s) {
             logger.error(s.getMessage());
             return null;
