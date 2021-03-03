@@ -64,6 +64,11 @@ public class ReimbursementController {
             return;
         }
         Expense expense = gson.fromJson(ctx.body(), Expense.class);
+        if(expense == null) {
+            ctx.status(400);
+            ctx.result("No expense info provided");
+            return;
+        }
         try {
             Expense createdExpense = service.createExpense(user, expense);
             if (createdExpense == null) {
@@ -153,11 +158,20 @@ public class ReimbursementController {
         } catch (NumberFormatException n) {
             ctx.status(400);
             ctx.result(n.getMessage());
+        } catch (NullPointerException e) {
+            ctx.status(400);
+            ctx.result("No expense info given");
         }
     };
 
     public Handler getUserLogin = (ctx) -> {
         LoginAttempt login = gson.fromJson(ctx.body(), LoginAttempt.class);
+        if(login == null) {
+            ctx.status(400);
+            ctx.result("No login information provided");
+            logger.warn("Login attempt made with empty request payload");
+            return;
+        }
         User user = service.login(login);
         if(user == null) {
             ctx.status(403);

@@ -70,29 +70,51 @@ public class ReimbursementServiceImpl implements ReimbursementService{
             throw new IllegalAccessException("Cannot update a completed expense");
         }
 
-        // next enforce what can be done by non-managers
-        if(!user.isManager()) {
+        // Date and userId cannot change, setting for return value
+        expense.setDateSubmitted(e.getDateSubmitted());
+        expense.setUserId(e.getUserId());
+
+        // next enforce what can be done by non-managers, or managers updating their own expenses
+        if(!user.isManager() || (user.getUserId() == e.getUserId())) {
             // Non-managers cannot update other people's expenses
             if(user.getUserId() != e.getUserId()) {
                 logger.warn("User "+ user.getUsername() + " attempted to illegally update expense "+ expense.getExpenseId()+".");
                 throw new IllegalAccessException("User is not permitted to update the indicated expense");
             }
-            // set parameters that non-managers cannot change
+            // set parameters that self-updates cannot change
             expense.setStatus(ExpenseStatus.PENDING);
             expense.setManagerHandler(0);
             expense.setReasonResolved(null);
             expense.setDateResolved(0);
+
+            // update reason, fileURL, amount only if a new one was given, otherwise, keep the old value
+            if(expense.getReasonSubmitted() == null || expense.getReasonSubmitted().equals("")) {
+                expense.setReasonSubmitted(e.getReasonSubmitted());
+            }
+            if(expense.getFileURL() == null || expense.getFileURL().equals("")) {
+                expense.setFileURL(e.getFileURL());
+            }
+            if(expense.getAmountInCents() <=0) {
+                expense.setAmountInCents(e.getAmountInCents());
+            }
             return dao.updateExpense(expense);
         }
-        expense.setDateResolved(System.currentTimeMillis()/1000L);
-        expense.setManagerHandler(user.getUserId());
-        // finally perform some checking from the manager side
+
+        // Only get here if user is a manager and they are updating someone else's expense, enforce changeable fields
+        // first, managers must change the status
         if(expense.getStatus() == ExpenseStatus.PENDING) {
-            // if the manager is not resolving the expense, maintain these parameters as is
-            expense.setManagerHandler(0);
-            expense.setReasonResolved(null);
-            expense.setDateResolved(0);
+            logger.warn("User "+user.getUsername()+" with manager privileges attempted to change another's expense without resolving it");
+            throw new IllegalAccessException("Manager must change status if they are updating another's request.");
         }
+        // fields that managers cannot change
+        expense.setReasonSubmitted(e.getReasonSubmitted());
+        expense.setFileURL(e.getFileURL());
+        expense.setAmountInCents(e.getAmountInCents());
+
+        // auto update fields
+        expense.setManagerHandler(user.getUserId());
+        expense.setDateResolved(System.currentTimeMillis()/1000L);
+
         return dao.updateExpense(expense);
     }
 

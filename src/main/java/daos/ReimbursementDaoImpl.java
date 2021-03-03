@@ -17,12 +17,13 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
     @Override
     public Expense createExpense(Expense expense) {
         try(Connection conn = ConnectionUtil.createConnection()) {
-            String query = "insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted) values (?,?,?,?)";
+            String query = "insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, file_url) values (?,?,?,?,?)";
             PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, expense.getUserId());
             ps.setInt(2, expense.getAmountInCents());
             ps.setString(3, expense.getReasonSubmitted());
             ps.setLong(4, expense.getDateSubmitted());
+            ps.setString(5, expense.getFileURL());
             ps.execute();
 
             ResultSet rs = ps.getGeneratedKeys();

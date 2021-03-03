@@ -21,6 +21,7 @@ create table expense (
 alter table expense add foreign key (user_id) references users(user_id);
 alter table expense add foreign key (manager_handler) references users(user_id);
 alter table expense alter column status set not null;
+alter table expense add constraint amount_cents_positive check (amount_cents>0);
 
 insert into users (username, pass_word, is_manager) values ('TEST_USER_1', 'password', true);
 insert into users (username, pass_word, is_manager) values ('TEST_USER_2', 'password', false);
