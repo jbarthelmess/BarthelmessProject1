@@ -7,7 +7,7 @@ import entities.LoginAttempt;
 import entities.User;
 import org.apache.log4j.Logger;
 
-import java.util.HashSet;
+import java.util.Set;
 
 public class ReimbursementServiceImpl implements ReimbursementService{
     private final ReimbursementDAO dao;
@@ -37,7 +37,7 @@ public class ReimbursementServiceImpl implements ReimbursementService{
     }
 
     @Override
-    public HashSet<Expense> getAllExpenses(User user) throws IllegalAccessException{
+    public Set<Expense> getAllExpenses(User user) throws IllegalAccessException{
         if(!user.isManager()) {
             logger.warn("User "+ user.getUsername() + " attempted to illegally access all expenses.");
             throw new IllegalAccessException("User is not permitted to access all expenses");
@@ -119,7 +119,13 @@ public class ReimbursementServiceImpl implements ReimbursementService{
     }
 
     @Override
-    public User login(LoginAttempt loginAttempt) {
+    public User login(LoginAttempt loginAttempt) throws IllegalAccessException{
+        if(loginAttempt.getUsername() == null || loginAttempt.getUsername().equals("")) {
+            throw new IllegalAccessException("Username field cannot be null or empty. Please try again");
+        }
+        if(loginAttempt.getPassword() == null || loginAttempt.getPassword().equals("")) {
+            throw new IllegalAccessException("Password field cannot be null or empty. Please try again");
+        }
         return dao.checkLogin(loginAttempt);
     }
 }

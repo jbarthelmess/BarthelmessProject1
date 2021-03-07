@@ -7,7 +7,7 @@ import entities.ExpenseStatus;
 import entities.User;
 import org.junit.jupiter.api.*;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -89,7 +89,7 @@ public class ReimbursementDaoTests {
     @Test
     @Order(4)
     void get_all_expenses() {
-        HashSet<Expense> expenses = dao.getAllExpenses();
+        Set<Expense> expenses = dao.getAllExpenses();
         Assertions.assertNotNull(expenses);
         Assertions.assertNotEquals(0, expenses.size());
         for(Expense expense : expenses) {

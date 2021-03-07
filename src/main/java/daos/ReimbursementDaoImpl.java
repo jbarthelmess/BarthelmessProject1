@@ -8,6 +8,7 @@ import utils.ConnectionUtil;
 
 import java.sql.*;
 import java.util.HashSet;
+import java.util.Set;
 
 import static java.sql.Types.NULL;
 
@@ -94,12 +95,12 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
     }
 
     @Override
-    public HashSet<Expense> getAllExpenses() {
+    public Set<Expense> getAllExpenses() {
         try (Connection conn = ConnectionUtil.createConnection()) {
             String query = "select * from expense";
             PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
-            HashSet<Expense> expenses = new HashSet<>();
+            Set<Expense> expenses = new HashSet<>();
             while(rs.next()) {
                 Expense expense = new Expense();
                 expense.setExpenseId(rs.getInt("expense_id"));
@@ -151,6 +152,7 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
         }
     }
 
+    @Override
     public User checkLogin(LoginAttempt loginAttempt) {
         try (Connection conn = ConnectionUtil.createConnection()) {
             String query = "select username, user_id, is_manager from users where username = ? and pass_word = ?";

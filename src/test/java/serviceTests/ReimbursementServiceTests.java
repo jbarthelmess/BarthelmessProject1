@@ -1,6 +1,5 @@
 package serviceTests;
 
-//import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import daos.ReimbursementDAO;
 import daos.ReimbursementDaoImpl;
 import entities.Expense;
@@ -9,7 +8,7 @@ import org.junit.jupiter.api.*;
 import services.ReimbursementService;
 import services.ReimbursementServiceImpl;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -62,7 +61,7 @@ public class ReimbursementServiceTests {
     @Order(2)
     void get_all_expenses() {
         try {
-            HashSet<Expense> expenses = service.getAllExpenses(manager);
+            Set<Expense> expenses = service.getAllExpenses(manager);
             Assertions.assertEquals(4, expenses.size());
         } catch (IllegalAccessException e) {
             fail(e.getMessage());
@@ -159,7 +158,7 @@ public class ReimbursementServiceTests {
     void update_expense_3() {
         Expense e = manager.getMyExpenses().iterator().next();
         Assertions.assertNotEquals(e.getUserId(), employee.getUserId());
-        IllegalAccessException i = Assertions.assertThrows(IllegalAccessException.class, () -> service.updateExpense(employee, e));
+        Assertions.assertThrows(IllegalAccessException.class, () -> service.updateExpense(employee, e));
     }
 
     @Test

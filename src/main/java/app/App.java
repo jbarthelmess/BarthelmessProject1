@@ -21,11 +21,11 @@ public class App {
 
             app.post("/users/login", controller.getUserLogin);
 
-            app.get("/users/:userId", controller.getUser);
-            app.post("/users/:userId/expense", controller.createExpense);
-            app.get("/users/:userId/expense/:expenseId", controller.getExpense);
-            app.put("/users/:userId/expense/:expenseId", controller.updateExpense);
-            app.get("/users/:userId/expense", controller.getAllExpenses);
+            app.get("/users", controller.getUser);
+            app.post("/users/expense", controller.createExpense);
+            app.get("/users/expense/:expenseId", controller.getExpense);
+            app.put("/users/expense/:expenseId", controller.updateExpense);
+            app.get("/users/expense", controller.getAllExpenses);
 
             app.start();
         } catch (NullPointerException n) {

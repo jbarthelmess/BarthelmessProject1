@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import services.ReimbursementService;
 import utils.JwtUtil;
 
-import java.util.HashSet;
+import java.util.Set;
 
 public class ReimbursementController {
     private ReimbursementService service;
@@ -120,7 +120,7 @@ public class ReimbursementController {
             return;
         }
         try {
-            HashSet<Expense> expenses = service.getAllExpenses(user);
+            Set<Expense> expenses = service.getAllExpenses(user);
             if(expenses == null) {
                 ctx.status(500);
                 ctx.result("Could not retrieve expenses");
@@ -172,16 +172,21 @@ public class ReimbursementController {
             logger.warn("Login attempt made with empty request payload");
             return;
         }
-        User user = service.login(login);
-        if(user == null) {
+        try{
+            User user = service.login(login);
+            if (user == null) {
+                ctx.status(403);
+                ctx.result("Login failed");
+                logger.warn("Failed attempted login with username: " + login.getUsername());
+                return;
+            }
+            String jwt = JwtUtil.generate(user);
+            ctx.status(200);
+            ctx.result(jwt);
+            logger.info("Login for user " + login.getUsername());
+        } catch (IllegalAccessException i) {
             ctx.status(403);
-            ctx.result("Login failed");
-            logger.warn("Failed attempted login with username: "+login.getUsername());
-            return;
+            ctx.result(i.getMessage());
         }
-        String jwt = JwtUtil.generate(user);
-        ctx.status(200);
-        ctx.result(jwt);
-        logger.info("Login for user "+login.getUsername());
     };
 }
