@@ -7,12 +7,14 @@ public class User {
     private String username;
     private boolean isManager;
     private HashSet<Expense> myExpenses;
+    private String jwt;
 
     public User() {
         this.userId = 0;
         this.username = "";
         this.isManager = false;
         this.myExpenses = null;
+        this.jwt = null;
     }
 
     public int getUserId() {
@@ -57,5 +59,13 @@ public class User {
             throw new IllegalArgumentException("Expenses cannot be null");
         }
         this.myExpenses = myExpenses;
+    }
+
+    public String getJwt() {
+        return this.jwt;
+    }
+
+    public void setJwt(String jwt) {
+        this.jwt = jwt;
     }
 }

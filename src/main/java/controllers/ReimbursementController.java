@@ -2,6 +2,7 @@ package controllers;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import entities.Expense;
 import entities.LoginAttempt;
 import entities.User;
@@ -63,13 +64,13 @@ public class ReimbursementController {
             ctx.result("Missing or invalid JWT. Please log in");
             return;
         }
-        Expense expense = gson.fromJson(ctx.body(), Expense.class);
-        if(expense == null) {
-            ctx.status(400);
-            ctx.result("No expense info provided");
-            return;
-        }
         try {
+            Expense expense = gson.fromJson(ctx.body(), Expense.class);
+            if(expense == null) {
+                ctx.status(400);
+                ctx.result("No expense info provided");
+                return;
+            }
             Expense createdExpense = service.createExpense(user, expense);
             if (createdExpense == null) {
                 ctx.status(500);
@@ -82,6 +83,9 @@ public class ReimbursementController {
             logger.error(e.getMessage());
             ctx.status(400);
             ctx.result(e.getMessage());
+        } catch (JsonSyntaxException n) {
+            ctx.status(400);
+            ctx.result(n.getMessage());
         }
     };
 
@@ -181,8 +185,9 @@ public class ReimbursementController {
                 return;
             }
             String jwt = JwtUtil.generate(user);
+            user.setJwt(jwt);
             ctx.status(200);
-            ctx.result(jwt);
+            ctx.result(gson.toJson(user));
             logger.info("Login for user " + login.getUsername());
         } catch (IllegalAccessException i) {
             ctx.status(403);
