@@ -71,7 +71,7 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
     @Override
     public Expense getExpense(int expenseId) {
         try (Connection conn = ConnectionUtil.createConnection()) {
-            String query = "select * from expense where expense_id = ?";
+            String query = "select expense.*, users.username from users natural join expense where expense_id = ?";
             PreparedStatement ps = conn.prepareStatement(query);
             ps.setInt(1, expenseId);
             ResultSet rs = ps.executeQuery();
@@ -87,6 +87,7 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
             expense.setUserId(rs.getInt("user_id"));
             expense.setManagerHandler(rs.getInt("manager_handler"));
             expense.setFileURL(rs.getString("file_url"));
+            expense.setUsername(rs.getString("username"));
             return expense;
         } catch (SQLException s) {
             logger.error(s.getMessage());

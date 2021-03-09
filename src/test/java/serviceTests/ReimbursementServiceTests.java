@@ -3,6 +3,7 @@ package serviceTests;
 import daos.ReimbursementDAO;
 import daos.ReimbursementDaoImpl;
 import entities.Expense;
+import entities.ExpenseStatus;
 import entities.User;
 import org.junit.jupiter.api.*;
 import services.ReimbursementService;
@@ -10,30 +11,30 @@ import services.ReimbursementServiceImpl;
 
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ReimbursementServiceTests {
     private static final ReimbursementDAO dao = new ReimbursementDaoImpl();
+
     private static final ReimbursementService service = new ReimbursementServiceImpl(dao);
     private static User manager;
     private static User employee;
+    private static Expense createdExpense;
 
     /*
-    User TEST_USER_1 is a manager inside the database
-    User TEST_USER_2 is an employee inside the database
+    User Andrew Wiggin is an employee inside the database
+    User Peter Wiggin is a manager inside the database
     We will use both for testing
     * */
     @BeforeAll
     public static void setup() {
         manager = new User();
-        manager.setUserId(1);
+        manager.setUserId(2);
         manager.setManager(true);
-        manager.setUsername("TEST_USER_1"); // this is the important part, it's what the query searches for in db
+        manager.setUsername("Peter Wiggin"); // this is the important part, it's what the query searches for in db
 
         employee = new User();
-        employee.setUsername("TEST_USER_2");
-        employee.setUserId(2);
+        employee.setUsername("Andrew Wiggin");
+        employee.setUserId(1);
         employee.setManager(false);
     }
 
@@ -45,7 +46,7 @@ public class ReimbursementServiceTests {
         Assertions.assertEquals(employee.getUsername(), user.getUsername());
         Assertions.assertEquals(employee.isManager(), user.isManager());
         Assertions.assertNotNull(user.getMyExpenses());
-        Assertions.assertEquals(3, user.getMyExpenses().size());
+        Assertions.assertNotEquals(0, user.getMyExpenses().size());
         employee = user;
 
         user = service.getUser(manager);
@@ -53,7 +54,7 @@ public class ReimbursementServiceTests {
         Assertions.assertEquals(manager.getUsername(), user.getUsername());
         Assertions.assertEquals(manager.isManager(), user.isManager());
         Assertions.assertNotNull(user.getMyExpenses());
-        Assertions.assertEquals(1, user.getMyExpenses().size());
+        Assertions.assertNotEquals(0, user.getMyExpenses().size());
         manager = user;
     }
 
@@ -62,9 +63,9 @@ public class ReimbursementServiceTests {
     void get_all_expenses() {
         try {
             Set<Expense> expenses = service.getAllExpenses(manager);
-            Assertions.assertEquals(4, expenses.size());
+            Assertions.assertNotEquals(0, expenses.size());
         } catch (IllegalAccessException e) {
-            fail(e.getMessage());
+            Assertions.fail(e.getMessage());
         }
     }
 
@@ -89,7 +90,7 @@ public class ReimbursementServiceTests {
             Assertions.assertEquals(e.getReasonSubmitted(), expense.getReasonSubmitted());
             Assertions.assertEquals(e.getFileURL(), expense.getFileURL());
         } catch (IllegalAccessException i) {
-            fail(i.getMessage());
+            Assertions.fail(i.getMessage());
         }
     }
 
@@ -107,7 +108,7 @@ public class ReimbursementServiceTests {
             Assertions.assertEquals(e.getReasonSubmitted(), expense.getReasonSubmitted());
             Assertions.assertEquals(e.getFileURL(), expense.getFileURL());
         } catch (IllegalAccessException i) {
-            fail(i.getMessage());
+            Assertions.fail(i.getMessage());
         }
     }
 
@@ -121,54 +122,77 @@ public class ReimbursementServiceTests {
 
     @Test
     @Order(7)
-    void update_expense() {
-        Expense e = employee.getMyExpenses().iterator().next();
-        try {
-            int amount = e.getAmountInCents();
-            e.setAmountInCents(e.getAmountInCents()+500);
-            service.updateExpense(employee, e);
-            Expense expense = service.getExpense(employee, e.getExpenseId());
-            Assertions.assertNotNull(expense);
-            Assertions.assertEquals(amount + 500,expense.getAmountInCents());
-
-        } catch (IllegalAccessException i) {
-            fail(i.getMessage());
-        }
+    void create_expense() {
+        createdExpense = new Expense();
+        createdExpense.setAmountInCents(800);
+        createdExpense.setReasonSubmitted("SERVICE TEST REASON");
+        Expense e = service.createExpense(employee, createdExpense);
+        Assertions.assertNotEquals(0, e.getExpenseId());
+        Assertions.assertNotEquals(0, e.getDateSubmitted());
+        Assertions.assertEquals(ExpenseStatus.PENDING, e.getStatus());
+        Assertions.assertEquals(employee.getUserId(), e.getUserId());
     }
 
     @Test
     @Order(8)
-    void update_expense_2() {
-        Expense e = employee.getMyExpenses().iterator().next();
+    void update_expense() {
         try {
-            int amount = e.getAmountInCents();
-            e.setAmountInCents(e.getAmountInCents()-500);
-            service.updateExpense(manager, e); // should work with manager as requester
-            Expense expense = service.getExpense(employee, e.getExpenseId());
-            Assertions.assertNotNull(expense);
-            Assertions.assertEquals(amount - 500,expense.getAmountInCents());
-
+            int amount = createdExpense.getAmountInCents();
+            createdExpense.setAmountInCents(createdExpense.getAmountInCents()+500);
+            service.updateExpense(employee, createdExpense);
+            Expense updatedExpense = service.getExpense(employee, createdExpense.getExpenseId());
+            Assertions.assertNotNull(updatedExpense);
+            Assertions.assertEquals(amount + 500,updatedExpense.getAmountInCents());
         } catch (IllegalAccessException i) {
-            fail(i.getMessage());
+            Assertions.fail(i.getMessage());
         }
     }
 
     @Test
     @Order(9)
+    void update_expense_2() {
+        createdExpense.setAmountInCents(createdExpense.getAmountInCents()-500);
+        // managers cannot update employees expenses without setting the status
+        IllegalAccessException i = Assertions.assertThrows(IllegalAccessException.class, () -> service.updateExpense(manager, createdExpense));
+        System.out.println(i.getMessage());
+        createdExpense.setAmountInCents(createdExpense.getAmountInCents()+500);
+    }
+
+    @Test
+    @Order(10)
     void update_expense_3() {
         Expense e = manager.getMyExpenses().iterator().next();
+        // employees cannot update other's expenses
         Assertions.assertNotEquals(e.getUserId(), employee.getUserId());
         Assertions.assertThrows(IllegalAccessException.class, () -> service.updateExpense(employee, e));
     }
 
     @Test
-    @Order(10)
-    void create_expense() {
-        Expense expense = new Expense();
-        expense.setAmountInCents(300);
-        expense.setDateSubmitted(System.currentTimeMillis()/1000L);
-        expense.setReasonSubmitted("SERVICE TEST REASON");
-        Expense e = service.createExpense(employee, expense);
-        Assertions.assertNotEquals(0, e.getExpenseId());
+    @Order(11)
+    void update_expense_4() {
+        // employees cannot approve expenses, will go through but approved field will not persist
+        createdExpense.setStatus(ExpenseStatus.APPROVED);
+        try {
+            Expense e = service.updateExpense(employee, createdExpense);
+            Assertions.assertEquals(ExpenseStatus.PENDING, e.getStatus());
+            createdExpense.setStatus(ExpenseStatus.PENDING);
+        } catch (IllegalAccessException i) {
+            Assertions.fail(i.getMessage());
+        }
+    }
+
+    @Test
+    @Order(12)
+    void update_expense_5() {
+        createdExpense.setStatus(ExpenseStatus.DENIED);
+        createdExpense.setReasonResolved("SERVICE TEST REASON RESOLVED");
+        try {
+            Expense expense = service.updateExpense(manager, createdExpense);
+            Assertions.assertEquals("SERVICE TEST REASON RESOLVED", expense.getReasonResolved());
+            Assertions.assertNotEquals(0,expense.getDateResolved());
+            Assertions.assertEquals(ExpenseStatus.DENIED, expense.getStatus());
+        } catch(IllegalAccessException i) {
+            Assertions.fail(i.getMessage());
+        }
     }
 }

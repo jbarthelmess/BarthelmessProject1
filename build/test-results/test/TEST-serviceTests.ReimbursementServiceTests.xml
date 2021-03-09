@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="serviceTests.ReimbursementServiceTests" tests="12" skipped="0" failures="0" errors="0" timestamp="2021-03-09T18:41:23" hostname="DESKTOP-T6NR4LV" time="6.599">
+  <properties/>
+  <testcase name="get_user()" classname="serviceTests.ReimbursementServiceTests" time="1.199"/>
+  <testcase name="get_all_expenses()" classname="serviceTests.ReimbursementServiceTests" time="0.304"/>
+  <testcase name="get_all_expenses_illegal_access_exception()" classname="serviceTests.ReimbursementServiceTests" time="0.023"/>
+  <testcase name="get_expense()" classname="serviceTests.ReimbursementServiceTests" time="0.312"/>
+  <testcase name="get_expense_2()" classname="serviceTests.ReimbursementServiceTests" time="0.856"/>
+  <testcase name="get_expense_3()" classname="serviceTests.ReimbursementServiceTests" time="0.316"/>
+  <testcase name="create_expense()" classname="serviceTests.ReimbursementServiceTests" time="0.301"/>
+  <testcase name="update_expense()" classname="serviceTests.ReimbursementServiceTests" time="1.169"/>
+  <testcase name="update_expense_2()" classname="serviceTests.ReimbursementServiceTests" time="0.29"/>
+  <testcase name="update_expense_3()" classname="serviceTests.ReimbursementServiceTests" time="0.323"/>
+  <testcase name="update_expense_4()" classname="serviceTests.ReimbursementServiceTests" time="0.87"/>
+  <testcase name="update_expense_5()" classname="serviceTests.ReimbursementServiceTests" time="0.618"/>
+  <system-out><![CDATA[User is not permitted to access all expenses
+User is not permitted to access the indicated expense
+Manager must change status if they are updating another's request.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

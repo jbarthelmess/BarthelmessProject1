@@ -11,6 +11,7 @@ public class Expense {
     private long dateResolved;
     private ExpenseStatus status;
     private String fileURL;
+    private String username;
 
     public Expense() {
         this.expenseId = 0;
@@ -22,6 +23,15 @@ public class Expense {
         this.reasonResolved = null;
         this.status = ExpenseStatus.PENDING;
         this.fileURL = null;
+        this.username = null;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public int getExpenseId() {

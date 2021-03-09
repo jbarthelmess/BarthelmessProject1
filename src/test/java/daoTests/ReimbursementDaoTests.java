@@ -20,19 +20,24 @@ public class ReimbursementDaoTests {
     @BeforeAll
     public static void setup() {
         /*
-        Database has 2 users:
-            TEST_USER_1 who is a manager
-            TEST_USER_2 who is not a manager
-        Database has 4 expenses:
-            1 belongs to TEST_USER_1
-            3 belong to TEST_USER_2
+        Database has 8 users: (-M means manager)
+            1. Andrew Wiggin
+            2. Peter Wiggin - M
+            3. Valentine Wiggin
+            4. Hyrum Graff - M
+            5. Mazer Rackham - M
+            6. Anderson - M
+            7. Petra Arkanian
+            8. Julian Delphiki
+        Database has 12 expenses:
+            Each Manager has 1, Each employee has 2
             All are pending
 
-        We will be working with TEST_USER_2's expenses, so we start by setting up her user info
+        We will be working with Andrew Wiggin for now
         */
         user = new User();
-        user.setUsername("TEST_USER_2");
-        user.setUserId(2);
+        user.setUsername("Andrew Wiggin");
+        user.setUserId(1);
         user.setManager(false);
     }
 
@@ -75,11 +80,11 @@ public class ReimbursementDaoTests {
     @Test
     @Order(3)
     void get_expense() {
-        // Expense ID's 1-4 are in the database
-        Expense expense = dao.getExpense(2);
+        // get expense that was just created
+        Expense expense = dao.getExpense(expenseId);
         Assertions.assertNotNull(expense);
-        Assertions.assertEquals(2, expense.getExpenseId());
-        Assertions.assertEquals(2, expense.getUserId());
+        Assertions.assertEquals(expenseId, expense.getExpenseId());
+        Assertions.assertEquals(user.getUserId(), expense.getUserId());
         Assertions.assertEquals(ExpenseStatus.PENDING, expense.getStatus());
         Assertions.assertNotNull(expense.getReasonSubmitted());
         Assertions.assertNotEquals("", expense.getReasonSubmitted());
@@ -112,7 +117,7 @@ public class ReimbursementDaoTests {
         //      - amount
         //      - file attachment
         Expense expense = dao.getExpense(expenseId);
-        expense.setReasonSubmitted("UPDATED");
+        expense.setReasonSubmitted("UPDATED DAO TEST EXPENSE REASON");
         expense.setAmountInCents(4);
         expense.setFileURL("https://cdn.britannica.com/36/22536-004-9855C103/Flag-Union-of-Soviet-Socialist-Republics.jpg");
         dao.updateExpense(expense);
@@ -121,9 +126,36 @@ public class ReimbursementDaoTests {
         Assertions.assertNotNull(updatedExpense);
         Assertions.assertEquals(4, updatedExpense.getAmountInCents());
         Assertions.assertEquals("https://cdn.britannica.com/36/22536-004-9855C103/Flag-Union-of-Soviet-Socialist-Republics.jpg", updatedExpense.getFileURL());
-        Assertions.assertEquals("UPDATED", expense.getReasonSubmitted());
+        Assertions.assertEquals("UPDATED DAO TEST EXPENSE REASON", expense.getReasonSubmitted());
         Assertions.assertEquals(expense.getStatus(), updatedExpense.getStatus());
         Assertions.assertEquals(expense.getUserId(), updatedExpense.getUserId());
+    }
 
+    @Test
+    @Order(6)
+    void resolve_expense() {
+        // This test will update fields that managers can update
+        //      - Resolution status
+        //      - Date resolved
+        //      - reason Resolved
+        //      - manager handler
+        Expense expense = dao.getExpense(expenseId);
+        expense.setReasonResolved("DAO TEST REASON RESOLVED");
+        expense.setDateResolved(System.currentTimeMillis()/1000L);
+        expense.setManagerHandler(2);
+        expense.setStatus(ExpenseStatus.DENIED);
+        dao.updateExpense(expense);
+
+        Expense updatedExpense = dao.getExpense(expenseId);
+        Assertions.assertNotNull(updatedExpense);
+        Assertions.assertEquals(expense.getAmountInCents(), updatedExpense.getAmountInCents());
+        Assertions.assertEquals(expense.getFileURL(), updatedExpense.getFileURL());
+        Assertions.assertEquals(expense.getReasonSubmitted(), updatedExpense.getReasonSubmitted());
+        Assertions.assertEquals(expense.getReasonResolved(), updatedExpense.getReasonResolved());
+        Assertions.assertEquals(expense.getStatus(), updatedExpense.getStatus());
+        Assertions.assertEquals(expense.getUserId(), updatedExpense.getUserId());
+        Assertions.assertEquals(expense.getDateSubmitted(), updatedExpense.getDateSubmitted());
+        Assertions.assertEquals(expense.getDateResolved(), updatedExpense.getDateResolved());
+        Assertions.assertEquals(expense.getManagerHandler(), updatedExpense.getManagerHandler());
     }
 }

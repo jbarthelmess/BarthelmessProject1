@@ -1,6 +1,5 @@
 try {
     userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    console.log(userInfo);
 } catch {
     alert("You are not authorized to view this page, please sign in");
     window.location.assign("file:///C:/Users/Josh/IdeaProjects/BartProject1/frontend/page.html");
@@ -20,6 +19,8 @@ function formatAmount(amount) {
 
 async function getExpense(id) {
     document.getElementById("resolve-form").hidden = true;
+    document.getElementById("start-edit").hidden = true;
+    document.getElementById("edit-expense").hidden = true;
     const httpRequest = await fetch(base+`/users/expense/${id}`, {
         method:"GET",
         headers:{
@@ -27,10 +28,14 @@ async function getExpense(id) {
         }
     });
     const fullExpense = await httpRequest.json();
+    console.log(fullExpense);
     renderFullExpense(fullExpense);
     // Managers should be able to resolve expenses 
     if(userInfo.isManager && fullExpense.userId !== userInfo.userId && fullExpense.status === "PENDING") {
         document.getElementById("resolve-form").hidden = false;
+    }
+    if(fullExpense.userId === userInfo.userId && fullExpense.status === "PENDING") {
+        document.getElementById("start-edit").hidden = false;
     }
 }
 
@@ -39,7 +44,7 @@ function renderFullExpense(fullExpense) {
     const detailsList = document.getElementById("expense-details");
     detailsList.hidden = false;
     detailsList.class = `${fullExpense.expenseId}`;
-    let listBody = `<li>ExpenseID: ${fullExpense.expenseId} for User ${fullExpense.userId}</li>`;
+    let listBody = `<li>ExpenseID: ${fullExpense.expenseId} for User ${fullExpense.username}</li>`;
     listBody += `<li>${formatAmount(fullExpense.amountInCents/100)} requested on ${formatDate(fullExpense.dateSubmitted)} Status: ${fullExpense.status}</li>`;
     listBody += `<li>Reason Submitted: ${fullExpense.reasonSubmitted}</li>`;
     if(!(fullExpense.status === "PENDING")) {
@@ -51,6 +56,11 @@ function renderFullExpense(fullExpense) {
     if(fullExpense.fileURL) {
         listBody+= `<li>Attached Reference File: <a href="${fullExpense.fileURL}">${fullExpense.fileURL}</a></li>`;
     }
+    const expenseDataSet = document.getElementById("edit-expense").dataset;
+    expenseDataSet.expense = fullExpense.expenseId;
+    expenseDataSet.userId = fullExpense.userId;
+    document.getElementById("edit-amount").value = fullExpense.amountInCents/100;
+    document.getElementById("edit-reason").value = fullExpense.reasonSubmitted;
     detailsList.innerHTML = listBody;
 }
 
@@ -147,6 +157,48 @@ async function addExpense(event) {
     populateTable([newExpense]);
 }
 
+async function updateExpense(event) {
+    event.preventDefault();
+    const verifyData = document.getElementById("edit-expense").dataset;
+    if(userInfo.userId !== Number(verifyData.userId)) {
+        alert("You are not authorized to update this expense");
+        document.getElementById("edit-expense").hidden = true;
+        document.getElementById("start-edit").hidden = true;
+        return;
+    }
+    const expenseId = verifyData.expense;
+    if(expenseId === 0) {
+        console.log("something went wrong");
+        return;
+    }
+    const amount = document.getElementById("edit-amount").value;
+    if(!amount || amount < 0) {
+        alert("Amount cannot be less than zero");
+        return;
+    }
+    const reason = document.getElementById("edit-reason").value;
+    if(!reason) {
+        alert("Reason cannot be empty");
+        return;
+    }
+    const httpRequest = await fetch(base+`/users/expense/${expenseId}`,{
+        method:"PUT",
+        headers:{
+            "Content-type":"application/json",
+            "Authorization":userInfo.jwt
+        },
+        body:JSON.stringify({
+            "amountInCents":amount*100,
+            "reasonSubmitted":reason
+        })
+    });
+    const response = await httpRequest.json();
+    document.getElementById(`expense-${expenseId}`).remove();
+    populateTable([response]);
+    renderFullExpense(response);
+    document.getElementById("edit-expense").hidden = true;
+}
+
 // populate the page with info
 async function populatePage() {
     const userHeaders = await fetch(base+"/users", {
@@ -158,10 +210,16 @@ async function populatePage() {
     const userData = await userHeaders.json();
     populateTable(userData.myExpenses);
     document.getElementById("new-expense-button").addEventListener("click", addExpense);
+    document.getElementById("edit-expense-button").addEventListener("click", updateExpense);
+    document.getElementById("edit-expense").dataset.userId = userInfo.userId;
     if(userInfo.isManager) {
         document.getElementById("all-expenses").hidden = false;
         document.getElementById("resolve-expense").addEventListener("click", resolveExpense);
     }
+    document.getElementById("start-edit").addEventListener("click", (e)=>{
+        e.preventDefault();
+        document.getElementById("edit-expense").hidden = false;
+    })
 }
 populatePage();
 
