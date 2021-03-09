@@ -12,10 +12,10 @@
       <table id="expenses">
         <thead>
             <tr>
-                <th>User ID</th>
-                <th>Date Submitted</th>
-                <th>Amount</th>
-                <th>Status</th>
+                <th onclick="sortRows(0)">User ID</th>
+                <th onclick="sortRows(1)">Date Submitted</th>
+                <th onclick="sortRows(2)">Amount</th>
+                <th onclick="sortRows(3)">Status</th>
             </tr>
         </thead>
         <tbody id="expense-data"></tbody>
@@ -41,7 +41,7 @@
     <!-- Expense details-->
     <div>
         <ul id="expense-details" hidden></ul>
-        <form id="resolve-form" hidden>
+        <div id="resolve-form" hidden>
             <label for="resolve-status">Resolution Status</label>
             <input list="resolve-list" id="resolve-status">
             <datalist id="resolve-list">
@@ -53,8 +53,7 @@
             <input type="text" id="resolve-reason">
 
             <button id="resolve-expense">Resolve</button>
-        </form>
-        
+        </div>
     </div>
 </body>
 </html>

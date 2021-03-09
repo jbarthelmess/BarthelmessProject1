@@ -7,6 +7,7 @@ try {
 }
 
 base = "http://localhost:7000";
+statusValue = {"PENDING":1, "DENIED":2, "APPROVED":3};
 
 function formatDate(date) {
     const info = new Date(date*1000);
@@ -59,8 +60,9 @@ function populateTable(expenses=[]) {
     for(expense of expenses) {
         const date = formatDate(expense.dateSubmitted);
         const amount = expense.amountInCents/100;
-        tableData += `<tr id="expense-${expense.expenseId}" onclick="getExpense(${expense.expenseId})">`;
-        tableData += `<td>${expense.userId}</td><td>${date}</td><td>${formatAmount(amount)}</td><td>${expense.status}</td></tr>`;
+        tableData += `<tr class="info" id="expense-${expense.expenseId}" onclick="getExpense(${expense.expenseId})">`;
+        tableData += `<td class="userId" data-value="${expense.userId}">${expense.userId}</td><td class="dateSubmitted" data-value="${expense.dateSubmitted}">${date}</td>`;
+        tableData += `<td class="amount" data-value="${amount}">${formatAmount(amount)}</td><td class="status" data-value="${statusValue[expense.status]}">${expense.status}</td></tr>`;
     }
     document.getElementById("expense-data").innerHTML += tableData;
 }
@@ -87,16 +89,15 @@ async function resolveExpense() {
         alert("You are not authorized to resolve expenses");
         return;
     }
+    const reason = document.getElementById("resolve-reason").value;
     const newStatus = document.getElementById("resolve-status").value;
+    document.getElementById("resolve-status").value = "";
+    document.getElementById("resolve-reason").value = "";
     if(!(newStatus === "APPROVED" || newStatus === "DENIED")) {
         alert("Invalid status provided");
         return;
     }
-    const reason = document.getElementById("resolve-reason").value;
     const expenseId = document.getElementById("expense-details").class;
-    console.log("resolving expense "+expenseId);
-    console.log("status: "+newStatus);
-    console.log("reason: "+reason);
     const httpRequest = await fetch(base+"/users/expense/"+expenseId, {
         method:"PUT",
         headers:{
@@ -110,6 +111,7 @@ async function resolveExpense() {
     });
     const updated = await httpRequest.json();
     document.getElementById("expense-"+expenseId).remove();
+    document.getElementById("resolve-form").hidden = true;
     renderFullExpense(updated);
     populateTable([updated]);
 }
@@ -162,3 +164,26 @@ async function populatePage() {
     }
 }
 populatePage();
+
+function sortRows(n) {
+    let table = document.getElementById("expenses");
+    let hasSwitched = true;
+    while(hasSwitched) {
+        hasSwitched = false;
+        let rows = table.rows;
+        let shouldSwitch = false;
+        let i = 1;
+        for(; i< rows.length-1; i++) {
+            let top = rows[i].getElementsByTagName("td")[n];
+            let bottom = rows[i+1].getElementsByTagName("td")[n];
+            if(Number(bottom.dataset.value) < Number(top.dataset.value)) {
+                shouldSwitch = true;
+                break;
+            }
+        }
+        if(shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i+1], rows[i]);
+            hasSwitched = true;
+        }
+    }
+}
