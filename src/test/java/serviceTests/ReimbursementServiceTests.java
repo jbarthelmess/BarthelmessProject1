@@ -4,6 +4,7 @@ import daos.ReimbursementDAO;
 import daos.ReimbursementDaoImpl;
 import entities.Expense;
 import entities.ExpenseStatus;
+import entities.ManagerStatistics;
 import entities.User;
 import org.junit.jupiter.api.*;
 import services.ReimbursementService;
@@ -194,5 +195,24 @@ public class ReimbursementServiceTests {
         } catch(IllegalAccessException i) {
             Assertions.fail(i.getMessage());
         }
+    }
+
+    @Test
+    @Order(13)
+    void get_manager_statistics() {
+        try {
+            ManagerStatistics stats = service.getManagerStatistics(manager);
+            Assertions.assertEquals(stats.getUserId(), manager.getUserId());
+            Assertions.assertTrue(stats.getDeniedCount() > 0);
+            System.out.println(stats);
+        } catch (IllegalAccessException i) {
+            Assertions.fail("manager should have access to statistics");
+        }
+    }
+
+    @Test
+    @Order(14)
+    void get_manager_statistics_as_employee() {
+        Assertions.assertThrows(IllegalAccessException.class, ()-> service.getManagerStatistics(employee));
     }
 }

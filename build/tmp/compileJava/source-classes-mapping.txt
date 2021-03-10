@@ -8,17 +8,19 @@ entities/LoginAttempt.java
  entities.LoginAttempt
 entities/User.java
  entities.User
-app/App.java
- app.App
+entities/ManagerStatistics.java
+ entities.ManagerStatistics
 entities/Expense.java
  entities.Expense
-controllers/ReimbursementController.java
- controllers.ReimbursementController
-services/ReimbursementServiceImpl.java
- services.ReimbursementServiceImpl
 daos/ReimbursementDAO.java
  daos.ReimbursementDAO
 daos/ReimbursementDaoImpl.java
  daos.ReimbursementDaoImpl
 services/ReimbursementService.java
  services.ReimbursementService
+services/ReimbursementServiceImpl.java
+ services.ReimbursementServiceImpl
+app/App.java
+ app.App
+controllers/ReimbursementController.java
+ controllers.ReimbursementController

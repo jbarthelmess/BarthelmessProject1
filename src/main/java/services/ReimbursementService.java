@@ -2,6 +2,7 @@ package services;
 
 import entities.Expense;
 import entities.LoginAttempt;
+import entities.ManagerStatistics;
 import entities.User;
 
 import java.util.Set;
@@ -54,4 +55,7 @@ public interface ReimbursementService {
      *
      * Returns the updated expense*/
     Expense updateExpense(User user, Expense expense) throws IllegalAccessException;
+
+    /** Gets manager statistics*/
+    ManagerStatistics getManagerStatistics(User user) throws IllegalAccessException;
 }

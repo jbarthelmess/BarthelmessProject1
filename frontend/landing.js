@@ -17,6 +17,9 @@ function formatAmount(amount) {
     return new Intl.NumberFormat("en-US",{style:"currency", currency:"USD"}).format(amount);
 }
 
+function formatPercent(percent) {
+    return String(Math.round(percent*100))+"%";
+}
 async function getExpense(id) {
     const httpRequest = await fetch(base+`/users/expense/${id}`, {
         method:"GET",
@@ -219,6 +222,7 @@ async function populatePage() {
     if(userInfo.isManager) {
         document.getElementById("all-expenses").hidden = false;
         document.getElementById("resolve-expense").addEventListener("click", resolveExpense);
+        getMangerStats();
     }
     document.getElementById("start-edit").addEventListener("click", (e)=>{
         e.preventDefault();
@@ -231,7 +235,6 @@ async function populatePage() {
     const header = document.getElementsByClassName("Welcome")[0];
     gridHolder.style.gridTemplateRows = `${header.offsetHeight}px 0.8fr 0.5fr`;
 }
-populatePage();
 
 function sortRows(n) {
     let table = document.getElementById("expenses");
@@ -255,3 +258,32 @@ function sortRows(n) {
         }
     }
 }
+
+/**Unfinished function */
+async function getMangerStats() {
+    if(!userInfo.isManager) {
+        alert("You are not authorized to access Manager Statistics")
+        return;
+    }
+    const httpRequest = await fetch(base+"/users/statistics", {
+        method:"GET",
+        headers:{
+            "Content-type":"application/json",
+            "Authorization":userInfo.jwt
+        }
+    });
+    const stats = await httpRequest.json();
+    const displayBox = document.getElementById("stats-display");
+    displayBox.hidden=false;
+    const displayList = document.getElementById("stats-summary");
+    if((stats.deniedCount + stats.approvedCount) === 0) {
+        displayBox.innerHTML += `<h6>You haven't resolved any expenses</h6>`;
+        return;
+    }
+    let display = `<li>Total Resolved Expenses: ${stats.deniedCount + stats.approvedCount}</li>`;
+    display+= `<li>Total Approved: ${stats.approvedCount} (${formatPercent(stats.approvedCount/(stats.approvedCount + stats.deniedCount))})</li>`;
+    display+= `<li>Total Denied: ${stats.deniedCount} (${formatPercent(stats.deniedCount/(stats.approvedCount + stats.deniedCount))})</li>`;
+    display+= `<li>Total Reimbursed: ${formatAmount(stats.totalReimbursed/100)}</li>`;
+    displayList.innerHTML = display;
+}
+populatePage();

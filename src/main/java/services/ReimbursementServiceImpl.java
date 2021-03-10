@@ -1,10 +1,7 @@
 package services;
 
 import daos.ReimbursementDAO;
-import entities.Expense;
-import entities.ExpenseStatus;
-import entities.LoginAttempt;
-import entities.User;
+import entities.*;
 import org.apache.log4j.Logger;
 
 import java.util.Set;
@@ -127,5 +124,13 @@ public class ReimbursementServiceImpl implements ReimbursementService{
             throw new IllegalAccessException("Password field cannot be null or empty. Please try again");
         }
         return dao.checkLogin(loginAttempt);
+    }
+
+    @Override
+    public ManagerStatistics getManagerStatistics(User user) throws IllegalAccessException {
+        if(!user.isManager()) {
+            throw new IllegalAccessException("Non-managers cannot access statistics");
+        }
+        return dao.getManagerStatistics(user);
     }
 }

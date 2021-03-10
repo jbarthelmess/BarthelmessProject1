@@ -4,6 +4,7 @@ import daos.ReimbursementDAO;
 import daos.ReimbursementDaoImpl;
 import entities.Expense;
 import entities.ExpenseStatus;
+import entities.ManagerStatistics;
 import entities.User;
 import org.junit.jupiter.api.*;
 
@@ -157,5 +158,18 @@ public class ReimbursementDaoTests {
         Assertions.assertEquals(expense.getDateSubmitted(), updatedExpense.getDateSubmitted());
         Assertions.assertEquals(expense.getDateResolved(), updatedExpense.getDateResolved());
         Assertions.assertEquals(expense.getManagerHandler(), updatedExpense.getManagerHandler());
+    }
+
+    @Test
+    @Order(7)
+    void get_manager_stats() {
+        User manager = new User();
+        manager.setManager(true);
+        manager.setUsername("Peter Wiggin");
+        manager.setUserId(2);
+        ManagerStatistics stats = dao.getManagerStatistics(manager);
+        Assertions.assertEquals(manager.getUserId(), stats.getUserId());
+        Assertions.assertTrue(stats.getDeniedCount() > 0);
+        System.out.println(stats);
     }
 }

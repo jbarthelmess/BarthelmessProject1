@@ -2,6 +2,7 @@ package daos;
 
 import entities.Expense;
 import entities.LoginAttempt;
+import entities.ManagerStatistics;
 import entities.User;
 
 import java.util.Set;
@@ -62,5 +63,9 @@ public interface ReimbursementDAO {
      * returns updated expense or null if no such expense exists in the database*/
     Expense updateExpense(Expense expense);
 
+    /** Retrieves approval and denial statistics for managers
+     *
+     * will just return an empty object if user isn't a manager*/
+    ManagerStatistics getManagerStatistics(User user);
     // For min spec there will be no delete methods
 }

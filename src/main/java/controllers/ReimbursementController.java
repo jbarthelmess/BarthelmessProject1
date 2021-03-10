@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import entities.Expense;
 import entities.LoginAttempt;
+import entities.ManagerStatistics;
 import entities.User;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
@@ -168,7 +169,7 @@ public class ReimbursementController {
         }
     };
 
-    public Handler getUserLogin = (ctx) -> {
+    public Handler getUserLogin = ctx -> {
         LoginAttempt login = gson.fromJson(ctx.body(), LoginAttempt.class);
         if(login == null) {
             ctx.status(400);
@@ -189,6 +190,28 @@ public class ReimbursementController {
             ctx.status(200);
             ctx.result(gson.toJson(user));
             logger.info("Login for user " + login.getUsername());
+        } catch (IllegalAccessException i) {
+            ctx.status(403);
+            ctx.result(i.getMessage());
+        }
+    };
+
+    public Handler getManagerStatistics = ctx -> {
+        User user = verifyAuthentication(ctx);
+        if(user == null) {
+            ctx.status(403);
+            ctx.result("Missing or invalid JWT. Please log in");
+            return;
+        }
+        try {
+            ManagerStatistics stats = service.getManagerStatistics(user);
+            if(stats == null) {
+                ctx.status(400);
+                ctx.result("Could not obtain statistics");
+                return;
+            }
+            ctx.status(200);
+            ctx.result(gson.toJson(stats));
         } catch (IllegalAccessException i) {
             ctx.status(403);
             ctx.result(i.getMessage());

@@ -26,6 +26,7 @@ public class App {
             app.get("/users/expense/:expenseId", controller.getExpense);
             app.put("/users/expense/:expenseId", controller.updateExpense);
             app.get("/users/expense", controller.getAllExpenses);
+            app.get("/users/statistics", controller.getManagerStatistics);
 
             app.start();
         } catch (NullPointerException n) {

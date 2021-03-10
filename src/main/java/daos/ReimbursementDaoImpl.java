@@ -2,6 +2,7 @@ package daos;
 
 import entities.Expense;
 import entities.LoginAttempt;
+import entities.ManagerStatistics;
 import entities.User;
 import org.apache.log4j.Logger;
 import utils.ConnectionUtil;
@@ -168,6 +169,32 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
             user.setUserId(rs.getInt("user_id"));
             user.setManager(rs.getBoolean("is_manager"));
             return user;
+        } catch (SQLException s) {
+            logger.error(s.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public ManagerStatistics getManagerStatistics(User user) {
+        try(Connection conn = ConnectionUtil.createConnection()) {
+            String query = "select status, count(expense_id), sum(amount_cents) from expense where manager_handler=? group by status";
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setInt(1, user.getUserId());
+            ResultSet rs = ps.executeQuery();
+            ManagerStatistics stats = new ManagerStatistics();
+            stats.setUserId(user.getUserId());
+            while(rs.next()) {
+                String status = rs.getString("status");
+                if(status.equals("APPROVED")) {
+                    stats.setApprovedCount(rs.getInt("count"));
+                    stats.setTotalReimbursed(rs.getInt("sum"));
+                }
+                if(status.equals("DENIED")) {
+                    stats.setDeniedCount(rs.getInt("count"));
+                }
+            }
+            return stats;
         } catch (SQLException s) {
             logger.error(s.getMessage());
             return null;
