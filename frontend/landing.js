@@ -18,9 +18,6 @@ function formatAmount(amount) {
 }
 
 async function getExpense(id) {
-    document.getElementById("resolve-form").hidden = true;
-    document.getElementById("start-edit").hidden = true;
-    document.getElementById("edit-expense").hidden = true;
     const httpRequest = await fetch(base+`/users/expense/${id}`, {
         method:"GET",
         headers:{
@@ -28,7 +25,9 @@ async function getExpense(id) {
         }
     });
     const fullExpense = await httpRequest.json();
-    console.log(fullExpense);
+    document.getElementById("resolve-form").hidden = true;
+    document.getElementById("start-edit").hidden = true;
+    document.getElementById("edit-expense").hidden = true;
     renderFullExpense(fullExpense);
     // Managers should be able to resolve expenses 
     if(userInfo.isManager && fullExpense.userId !== userInfo.userId && fullExpense.status === "PENDING") {
@@ -44,7 +43,7 @@ function renderFullExpense(fullExpense) {
     const detailsList = document.getElementById("expense-details");
     detailsList.hidden = false;
     detailsList.class = `${fullExpense.expenseId}`;
-    let listBody = `<li>ExpenseID: ${fullExpense.expenseId} for User ${fullExpense.username}</li>`;
+    let listBody = `<li id="full-expense-owner" data-name="${fullExpense.username}">Expense Submitted by ${fullExpense.username}</li>`;
     listBody += `<li>${formatAmount(fullExpense.amountInCents/100)} requested on ${formatDate(fullExpense.dateSubmitted)} Status: ${fullExpense.status}</li>`;
     listBody += `<li>Reason Submitted: ${fullExpense.reasonSubmitted}</li>`;
     if(!(fullExpense.status === "PENDING")) {
@@ -70,7 +69,7 @@ function populateTable(expenses=[]) {
     for(expense of expenses) {
         const date = formatDate(expense.dateSubmitted);
         const amount = expense.amountInCents/100;
-        tableData += `<tr class="info" id="expense-${expense.expenseId}" onclick="getExpense(${expense.expenseId})">`;
+        tableData += `<tr style="cursor: pointer;" class="info" id="expense-${expense.expenseId}" onclick="getExpense(${expense.expenseId})">`;
         tableData += `<td class="userId" data-value="${expense.userId}">${expense.userId}</td><td class="dateSubmitted" data-value="${expense.dateSubmitted}">${date}</td>`;
         tableData += `<td class="amount" data-value="${amount}">${formatAmount(amount)}</td><td class="status" data-value="${statusValue[expense.status]}">${expense.status}</td></tr>`;
     }
@@ -92,6 +91,7 @@ async function getAllExpenses() {
     const expenseBody = await expenseHeader.json();
     document.getElementById("expense-data").innerHTML = "";
     populateTable(expenseBody);
+    document.getElementById("all-expenses").hidden = true;
 }
 
 async function resolveExpense() {
@@ -122,6 +122,7 @@ async function resolveExpense() {
     const updated = await httpRequest.json();
     document.getElementById("expense-"+expenseId).remove();
     document.getElementById("resolve-form").hidden = true;
+    updated.username = document.getElementById("full-expense-owner").dataset.name;
     renderFullExpense(updated);
     populateTable([updated]);
 }
@@ -153,8 +154,9 @@ async function addExpense(event) {
         })
     });
     const newExpense = await expenseHeader.json();
-    console.log(newExpense);
+    newExpense.username = userInfo.username;
     populateTable([newExpense]);
+    renderFullExpense(newExpense);
 }
 
 async function updateExpense(event) {
@@ -193,6 +195,7 @@ async function updateExpense(event) {
         })
     });
     const response = await httpRequest.json();
+    response.username = userInfo.username;
     document.getElementById(`expense-${expenseId}`).remove();
     populateTable([response]);
     renderFullExpense(response);
@@ -209,6 +212,7 @@ async function populatePage() {
     });
     const userData = await userHeaders.json();
     populateTable(userData.myExpenses);
+    document.getElementById("name-header").innerText = `Welcome, ${userInfo.username.toLowerCase()}`;
     document.getElementById("new-expense-button").addEventListener("click", addExpense);
     document.getElementById("edit-expense-button").addEventListener("click", updateExpense);
     document.getElementById("edit-expense").dataset.userId = userInfo.userId;
@@ -218,8 +222,14 @@ async function populatePage() {
     }
     document.getElementById("start-edit").addEventListener("click", (e)=>{
         e.preventDefault();
-        document.getElementById("edit-expense").hidden = false;
+        const isHidden = document.getElementById("edit-expense");
+        isHidden.hidden = !isHidden.hidden;
+        const toggle = document.getElementById("start-edit");
+        toggle.innerText = isHidden.hidden ? "Edit Expense" : "Abandon Editing Expense";
     })
+    const gridHolder = document.getElementsByClassName("grid-container")[0];
+    const header = document.getElementsByClassName("Welcome")[0];
+    gridHolder.style.gridTemplateRows = `${header.offsetHeight}px 0.8fr 0.5fr`;
 }
 populatePage();
 

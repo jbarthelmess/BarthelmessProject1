@@ -1,0 +1,37 @@
+.grid-container {
+    display: grid;
+    grid-template-columns: 0.1fr 1.6fr 0.1fr 1.1fr 0.6fr;
+    grid-template-rows: 0.2fr 0.8fr;
+    gap: 0px 0px;
+    grid-template-areas:
+      ". Welcome . . ."
+      ". expense-table . expense-specific .";
+  }
+  
+  .expense-table { grid-area: expense-table; }
+  
+  .expense-specific { grid-area: expense-specific; }
+
+  .Welcome { grid-area: Welcome;}
+
+  @font-face{
+      font-family:BladeRunner;
+      src: url(BLADRMF_.TTF)
+  }
+
+  h1,h2,h3,h4,h5,h6 {
+      font-family:BladeRunner;
+  }
+
+  #resolve-form {
+      padding-top:20px;
+  }
+
+  #edit-expense {
+      padding-top:20px;
+  }
+
+  #details-header {
+      padding-top:20px;
+  }
+  

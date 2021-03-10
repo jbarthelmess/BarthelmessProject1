@@ -1,0 +1,8 @@
+@font-face{
+    font-family:BladeRunner;
+    src: url(BLADRMF_.TTF)
+}
+
+h1 {
+    font-family:BladeRunner;
+}
