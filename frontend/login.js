@@ -1,6 +1,6 @@
 async function login() {
     let userInfo ={}; 
-    const base = "http://localhost:7000";
+    const base = "http://35.202.96.201:7000";
 
     // get login info from inputs
     let loginPackage = {};
@@ -26,8 +26,8 @@ async function login() {
     userInfo = await response.text();
     try {
         const userData = JSON.parse(userInfo);
-        localStorage.setItem("userInfo",userInfo);
-        window.location.href = "file:///C:/Users/Josh/IdeaProjects/BartProject1/frontend/landing.html"
+        sessionStorage.setItem("userInfo",userInfo);
+        window.location.assign("file:///C:/Users/Josh/IdeaProjects/BartProject1/frontend/landing.html");
     } catch(e) {
         alert("Login Attempt failed, please try again");
         return;

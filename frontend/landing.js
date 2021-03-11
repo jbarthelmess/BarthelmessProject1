@@ -1,11 +1,10 @@
 try {
-    userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
 } catch {
-    alert("You are not authorized to view this page, please sign in");
     window.location.assign("file:///C:/Users/Josh/IdeaProjects/BartProject1/frontend/page.html");
 }
 
-base = "http://localhost:7000";
+base = "http://35.202.96.201:7000";
 statusValue = {"PENDING":1, "DENIED":2, "APPROVED":3};
 
 function formatDate(date) {
