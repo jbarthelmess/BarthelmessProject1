@@ -7,12 +7,17 @@ import entities.Expense;
 import entities.LoginAttempt;
 import entities.ManagerStatistics;
 import entities.User;
+import io.javalin.core.util.FileUtil;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
+import io.javalin.http.UploadedFile;
 import org.apache.log4j.Logger;
 import services.ReimbursementService;
 import utils.JwtUtil;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 public class ReimbursementController {
@@ -215,6 +220,26 @@ public class ReimbursementController {
         } catch (IllegalAccessException i) {
             ctx.status(403);
             ctx.result(i.getMessage());
+        }
+    };
+
+    public Handler uploadFiles = ctx -> {
+        User user = verifyAuthentication(ctx);
+        if(user == null) {
+            ctx.status(403);
+            ctx.result("Missing or invalid JWT. Please log in");
+            return;
+        }
+        try {
+            List<UploadedFile> files = ctx.uploadedFiles("file");
+            FileUtil.streamToFile(files.get(0).getContent(), "/uploads/"+files.get(0).getFilename());
+            File file = new File("/uploads/"+files.get(0).getFilename());
+            String fileURL = service.uploadFile(file, user);
+            ctx.status(201);
+            ctx.result(fileURL);
+        } catch (NullPointerException | IOException n) {
+            ctx.status(400);
+            ctx.result(n.getMessage());
         }
     };
 }

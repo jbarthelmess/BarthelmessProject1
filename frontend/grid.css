@@ -34,4 +34,8 @@
   #details-header {
       padding-top:20px;
   }
+
+  .selected {
+      background-color:lightblue;
+  }
   

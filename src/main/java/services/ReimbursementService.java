@@ -4,7 +4,10 @@ import entities.Expense;
 import entities.LoginAttempt;
 import entities.ManagerStatistics;
 import entities.User;
+import io.javalin.http.Context;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 
 public interface ReimbursementService {
@@ -58,4 +61,7 @@ public interface ReimbursementService {
 
     /** Gets manager statistics*/
     ManagerStatistics getManagerStatistics(User user) throws IllegalAccessException;
+
+    /** Uploads a file to google cloud bucket*/
+    String uploadFile(File file, User user) throws IOException;
 }

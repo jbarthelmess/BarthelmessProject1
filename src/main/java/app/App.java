@@ -27,6 +27,7 @@ public class App {
             app.put("/users/expense/:expenseId", controller.updateExpense);
             app.get("/users/expense", controller.getAllExpenses);
             app.get("/users/statistics", controller.getManagerStatistics);
+            app.post("/users/upload", controller.uploadFiles);
 
             app.start();
         } catch (NullPointerException n) {

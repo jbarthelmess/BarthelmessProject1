@@ -1,10 +1,18 @@
 package services;
 
+import com.google.cloud.storage.*;
 import daos.ReimbursementDAO;
 import entities.*;
 import org.apache.log4j.Logger;
 
+import io.javalin.http.Context;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class ReimbursementServiceImpl implements ReimbursementService{
     private final ReimbursementDAO dao;
@@ -132,5 +140,14 @@ public class ReimbursementServiceImpl implements ReimbursementService{
             throw new IllegalAccessException("Non-managers cannot access statistics");
         }
         return dao.getManagerStatistics(user);
+    }
+
+    @Override
+    public String uploadFile(File file, User user) throws IOException {
+        Storage storage = StorageOptions.newBuilder().setProjectId("project0barthelmess").build().getService();
+        BlobId blobId = BlobId.of("barthelmessp1storage", user.getUsername()+"_"+file.getName());
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+        Blob blob = storage.create(blobInfo, Files.readAllBytes(Paths.get("/uploads/"+file.getName())));
+        return blob.getMediaLink();
     }
 }

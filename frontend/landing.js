@@ -3,8 +3,8 @@ try {
 } catch {
     window.location.assign("file:///C:/Users/Josh/IdeaProjects/BartProject1/frontend/page.html");
 }
-
-base = "http://35.202.96.201:7000";
+base = "http://localhost:7000";
+//base = "http://35.202.96.201:7000";
 statusValue = {"PENDING":1, "DENIED":2, "APPROVED":3};
 
 function formatDate(date) {
@@ -20,6 +20,12 @@ function formatPercent(percent) {
     return String(Math.round(percent*100))+"%";
 }
 async function getExpense(id) {
+    const lastSelected = [...document.getElementsByClassName("selected")];
+    for(let i of lastSelected) {
+        i.classList.toggle("selected");
+    }
+    const row = document.getElementById(`expense-${id}`);
+    row.classList.add("selected");
     const httpRequest = await fetch(base+`/users/expense/${id}`, {
         method:"GET",
         headers:{
@@ -55,7 +61,7 @@ function renderFullExpense(fullExpense) {
         }
     }
     if(fullExpense.fileURL) {
-        listBody+= `<li>Attached Reference File: <a href="${fullExpense.fileURL}">${fullExpense.fileURL}</a></li>`;
+        listBody+= `<li>Attached Reference File: <a href="${fullExpense.fileURL}">Download</a></li>`;
     }
     const expenseDataSet = document.getElementById("edit-expense").dataset;
     expenseDataSet.expense = fullExpense.expenseId;
@@ -144,16 +150,23 @@ async function addExpense(event) {
     document.getElementById("reason").value = "";
     document.getElementById("amount").value = "";
     // add file url later when I figure that out
+    let bodyJSON = {
+        "amountInCents":Math.round(amount*100),
+        "reasonSubmitted":description
+    };
+    const filePath = document.getElementById("file-upload").files[0];
+    if(filePath) {
+        const url = await uploadFile(filePath);
+        bodyJSON.fileURL = url;
+        document.getElementById("file-upload").value = "";
+    }
     const expenseHeader = await fetch(base+"/users/expense", {
         method:"POST",
         headers:{
             "Content-type":"application/json",
             "Authorization":userInfo.jwt
         },
-        body:JSON.stringify({
-            "amountInCents":Math.round(amount*100),
-            "reasonSubmitted":description
-        })
+        body:JSON.stringify(bodyJSON)
     });
     const newExpense = await expenseHeader.json();
     newExpense.username = userInfo.username;
@@ -185,16 +198,23 @@ async function updateExpense(event) {
         alert("Reason cannot be empty");
         return;
     }
+    let bodyJSON = {
+        "amountInCents":amount*100,
+        "reasonSubmitted":reason
+    };
+    const filePath = document.getElementById("edit-file-upload").files[0];
+    if(filePath) {
+        const url = await uploadFile(filePath);
+        bodyJSON.fileURL = url;
+        document.getElementById("edit-file-upload").value = "";
+    }
     const httpRequest = await fetch(base+`/users/expense/${expenseId}`,{
         method:"PUT",
         headers:{
             "Content-type":"application/json",
             "Authorization":userInfo.jwt
         },
-        body:JSON.stringify({
-            "amountInCents":amount*100,
-            "reasonSubmitted":reason
-        })
+        body:JSON.stringify(bodyJSON)
     });
     const response = await httpRequest.json();
     response.username = userInfo.username;
@@ -202,6 +222,7 @@ async function updateExpense(event) {
     populateTable([response]);
     renderFullExpense(response);
     document.getElementById("edit-expense").hidden = true;
+    document.getElementById("start-edit").innerText = "Edit Expense"
 }
 
 // populate the page with info
@@ -284,5 +305,13 @@ async function getMangerStats() {
     display+= `<li>Total Denied: ${stats.deniedCount} (${formatPercent(stats.deniedCount/(stats.approvedCount + stats.deniedCount))})</li>`;
     display+= `<li>Total Reimbursed: ${formatAmount(stats.totalReimbursed/100)}</li>`;
     displayList.innerHTML = display;
+}
+
+async function uploadFile(path) {
+    let formData = new FormData();
+    formData.append("file", path);
+    const httpRequest = await fetch(base+"/users/upload", {method:"POST", headers:{"Authorization":userInfo.jwt},body:formData});
+    const response = await httpRequest.text();
+    return response;
 }
 populatePage();

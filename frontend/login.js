@@ -1,6 +1,7 @@
 async function login() {
     let userInfo ={}; 
-    const base = "http://35.202.96.201:7000";
+    //const base = "http://35.202.96.201:7000";
+    const base = "http://localhost:7000";
 
     // get login info from inputs
     let loginPackage = {};

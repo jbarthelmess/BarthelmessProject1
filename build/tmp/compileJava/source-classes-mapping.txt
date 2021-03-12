@@ -12,15 +12,15 @@ entities/LoginAttempt.java
  entities.LoginAttempt
 entities/User.java
  entities.User
-app/App.java
- app.App
-entities/Expense.java
- entities.Expense
-controllers/ReimbursementController.java
- controllers.ReimbursementController
-entities/ManagerStatistics.java
- entities.ManagerStatistics
-utils/JwtUtil.java
- utils.JwtUtil
 services/ReimbursementService.java
  services.ReimbursementService
+entities/Expense.java
+ entities.Expense
+utils/JwtUtil.java
+ utils.JwtUtil
+entities/ManagerStatistics.java
+ entities.ManagerStatistics
+app/App.java
+ app.App
+controllers/ReimbursementController.java
+ controllers.ReimbursementController
