@@ -120,13 +120,13 @@ public class ReimbursementDaoTests {
         Expense expense = dao.getExpense(expenseId);
         expense.setReasonSubmitted("UPDATED DAO TEST EXPENSE REASON");
         expense.setAmountInCents(4);
-        expense.setFileURL("https://cdn.britannica.com/36/22536-004-9855C103/Flag-Union-of-Soviet-Socialist-Republics.jpg");
+        //expense.setFileURL("https://cdn.britannica.com/36/22536-004-9855C103/Flag-Union-of-Soviet-Socialist-Republics.jpg");
         dao.updateExpense(expense);
 
         Expense updatedExpense = dao.getExpense(expenseId);
         Assertions.assertNotNull(updatedExpense);
         Assertions.assertEquals(4, updatedExpense.getAmountInCents());
-        Assertions.assertEquals("https://cdn.britannica.com/36/22536-004-9855C103/Flag-Union-of-Soviet-Socialist-Republics.jpg", updatedExpense.getFileURL());
+        //Assertions.assertEquals("https://cdn.britannica.com/36/22536-004-9855C103/Flag-Union-of-Soviet-Socialist-Republics.jpg", updatedExpense.getFileURL());
         Assertions.assertEquals("UPDATED DAO TEST EXPENSE REASON", expense.getReasonSubmitted());
         Assertions.assertEquals(expense.getStatus(), updatedExpense.getStatus());
         Assertions.assertEquals(expense.getUserId(), updatedExpense.getUserId());

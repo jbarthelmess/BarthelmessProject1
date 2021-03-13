@@ -1,5 +1,7 @@
 package services;
 
+import com.google.api.client.util.Lists;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.*;
 import daos.ReimbursementDAO;
 import entities.*;
@@ -8,6 +10,7 @@ import org.apache.log4j.Logger;
 import io.javalin.http.Context;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -144,10 +147,17 @@ public class ReimbursementServiceImpl implements ReimbursementService{
 
     @Override
     public String uploadFile(File file, User user) throws IOException {
-        Storage storage = StorageOptions.newBuilder().setProjectId("project0barthelmess").build().getService();
-        BlobId blobId = BlobId.of("barthelmessp1storage", user.getUsername()+"_"+file.getName());
+        String projectId = System.getenv("P1_ID");
+        String bucketName = System.getenv("P1_BUCKET");
+        Storage storage = StorageOptions.getDefaultInstance().getService();
+        System.out.println(storage.getServiceAccount(projectId).getEmail());
+        BlobId blobId = BlobId.of(bucketName, user.getUsername()+"_"+file.getName());
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-        Blob blob = storage.create(blobInfo, Files.readAllBytes(Paths.get("/uploads/"+file.getName())));
-        return blob.getMediaLink();
+        try {
+            Blob blob = storage.create(blobInfo, Files.readAllBytes(Paths.get("uploads/"+file.getName())));
+            return blob.getMediaLink();
+        } catch (StorageException s) {
+            return s.getMessage();
+        }
     }
 }

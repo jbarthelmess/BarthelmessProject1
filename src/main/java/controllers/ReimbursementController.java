@@ -232,9 +232,18 @@ public class ReimbursementController {
         }
         try {
             List<UploadedFile> files = ctx.uploadedFiles("file");
-            FileUtil.streamToFile(files.get(0).getContent(), "/uploads/"+files.get(0).getFilename());
-            File file = new File("/uploads/"+files.get(0).getFilename());
+            File file = new File("uploads/"+files.get(0).getFilename());
+            if(!file.createNewFile()) {
+                System.out.println("File creation failed");
+                ctx.status(400);
+                ctx.result("Could not make new file");
+            }
+            System.out.println("Streaming input to "+file.getPath());
+            System.out.println("Context object");
+            FileUtil.streamToFile(files.get(0).getContent(), file.getPath());
+            System.out.println("File streamed successfully");
             String fileURL = service.uploadFile(file, user);
+            System.out.println("file is stored at "+fileURL);
             ctx.status(201);
             ctx.result(fileURL);
         } catch (NullPointerException | IOException n) {

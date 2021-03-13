@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="grid.css">
 </head>
 <body>
+    <nav class="navbar navbar-dark bg-dark justify-content-between">
+        <span id="heading">Battle School Expense Reimbursement System</span>
+        <button id="logout" class="btn btn-light" onclick="logout()">Logout</button>
+    </nav>
     <div class="grid-container">
         <div class="Welcome">
             <h1 id="name-header"></h1>
@@ -19,7 +23,7 @@
             <table id="expenses" class="table">
                 <thead class="thead-dark">
                     <tr>
-                        <th onclick="sortRows(0)" style="cursor: pointer;">User ID</th>
+                        <th onclick="sortRows(0)" style="cursor: pointer;">User</th>
                         <th onclick="sortRows(1)" style="cursor: pointer;">Date Submitted</th>
                         <th onclick="sortRows(2)" style="cursor: pointer;">Amount</th>
                         <th onclick="sortRows(3)" style="cursor: pointer;">Status</th>
@@ -52,8 +56,8 @@
                         </div>
                         <textarea id="reason" class="form-control"></textarea>
                     </div>
-                    <br>
-                    <input id="file-upload" type="file" class="form-control-file" name="file">
+                    <!--<br>
+                    <input id="file-upload" type="file" class="form-control-file" name="file"> -->
                     <br>
                     <button id="new-expense-button" class="btn btn-outline-dark">Create Expense</button>
                 </div>
@@ -98,8 +102,8 @@
                     </div>
                     <textarea id="edit-reason" class="form-control"></textarea>
                 </div>
-                <br>
-                <input id="edit-file-upload" type="file" class="form-control-file" name="file">
+                <!--<br>
+                <input id="edit-file-upload" type="file" class="form-control-file" name="file"> -->
                 <br>
                 <button id="edit-expense-button" class="btn btn-outline-dark">Update Expense</button>
             </div>

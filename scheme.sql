@@ -23,16 +23,25 @@ alter table expense add foreign key (manager_handler) references users(user_id);
 alter table expense alter column status set not null;
 alter table expense add constraint amount_cents_positive check (amount_cents>0);
 
-insert into users (username, pass_word, is_manager) values ('TEST_USER_1', 'password', true);
-insert into users (username, pass_word, is_manager) values ('TEST_USER_2', 'password', false);
-insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (1, 3500, 'Office Party', 1614467456, 'PENDING');
-insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (2, 40000, 'Gas Money for Road Trip', 1614467466, 'PENDING');
-insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (2, 8000, 'Lunch on the road', 1614467476, 'PENDING');
-insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (2, 7500, 'Cause I want Money', 1614467486, 'PENDING');
+insert into users (username, pass_word, is_manager) values ('Andrew Wiggin', 'Ender', false);
+insert into users (username, pass_word, is_manager) values ('Peter Wiggin', 'Locke', true);
+insert into users (username, pass_word, is_manager) values ('Valentine Wiggin', 'Demosthenes', false);
+insert into users (username, pass_word, is_manager) values ('Hyrum Graff', 'Colonel', true);
+insert into users (username, pass_word, is_manager) values ('Mazer Rackham', 'General', true);
+insert into users (username, pass_word, is_manager) values ('Anderson', 'Major', true);
+insert into users (username, pass_word, is_manager) values ('Petra Arkanian', 'Salamander', false);
+insert into users (username, pass_word, is_manager) values ('Julian Delphiki', 'Bean', false);
 
-insert into users (username, pass_word, is_manager) values ('TEST_USER_1', 'password', true);
-insert into users (username, pass_word, is_manager) values ('TEST_USER_2', 'password', false);
-insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (1, 3500, 'Office Party', 1614467456, 'pending');
-insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (2, 40000, 'Gas Money for Road Trip', 1614467466, 'pending');
-insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (2, 8000, 'Lunch on the road', 1614467476, 'pending');
-insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (2, 7500, 'Cause I want Money', 1614467486, 'pending');
+
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (1, 2000, 'Unfair Battles', 1614467456, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (1, 7000, 'All Green Recruits', 1614467466, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (2, 30000, 'New Article', 1614467476, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (3, 25000, 'New Article', 1614467486, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (3, 10000, 'Call to Ender', 1614467949, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (4, 350000, 'Damages to Training Center', 1614467959, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (5, 400000000, 'Spaceship Time Travel', 1614467969, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (6, 100000, 'Psych trauma bill', 1614467979, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (7, 4500, 'Training new army', 1614467989, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (7, 2100, 'Teaching Ender to Shoot', 1614467999, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (8, 10000, 'Being Smarter than Ender', 1614468009, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (8, 5000, 'Because I am short', 1614468019, 'PENDING');

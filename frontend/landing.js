@@ -3,8 +3,8 @@ try {
 } catch {
     window.location.assign("file:///C:/Users/Josh/IdeaProjects/BartProject1/frontend/page.html");
 }
-base = "http://localhost:7000";
-//base = "http://35.202.96.201:7000";
+//base = "http://localhost:7000";
+base = "http://35.202.96.201:7000";
 statusValue = {"PENDING":1, "DENIED":2, "APPROVED":3};
 
 function formatDate(date) {
@@ -50,6 +50,7 @@ async function getExpense(id) {
 function renderFullExpense(fullExpense) {
     const detailsList = document.getElementById("expense-details");
     detailsList.hidden = false;
+    detailsList.dataset.amount = fullExpense.amountInCents;
     detailsList.class = `${fullExpense.expenseId}`;
     let listBody = `<li id="full-expense-owner" data-name="${fullExpense.username}">Expense Submitted by ${fullExpense.username}</li>`;
     listBody += `<li>${formatAmount(fullExpense.amountInCents/100)} requested on ${formatDate(fullExpense.dateSubmitted)} Status: ${fullExpense.status}</li>`;
@@ -60,9 +61,11 @@ function renderFullExpense(fullExpense) {
             listBody += `<li>Reason Resolved: ${fullExpense.reasonResolved}</li>`;
         }
     }
+    /*
     if(fullExpense.fileURL) {
         listBody+= `<li>Attached Reference File: <a href="${fullExpense.fileURL}">Download</a></li>`;
     }
+    */
     const expenseDataSet = document.getElementById("edit-expense").dataset;
     expenseDataSet.expense = fullExpense.expenseId;
     expenseDataSet.userId = fullExpense.userId;
@@ -72,13 +75,13 @@ function renderFullExpense(fullExpense) {
 }
 
 /*populates the table */
-function populateTable(expenses=[]) {
+function populateTable(expenses=[], highlight=false) {
     let tableData = "";
     for(expense of expenses) {
         const date = formatDate(expense.dateSubmitted);
         const amount = expense.amountInCents/100;
-        tableData += `<tr style="cursor: pointer;" class="info" id="expense-${expense.expenseId}" onclick="getExpense(${expense.expenseId})">`;
-        tableData += `<td class="userId" data-value="${expense.userId}">${expense.userId}</td><td class="dateSubmitted" data-value="${expense.dateSubmitted}">${date}</td>`;
+        tableData += `<tr style="cursor: pointer;" class="info${highlight? " selected": ""}" id="expense-${expense.expenseId}" onclick="getExpense(${expense.expenseId})">`;
+        tableData += `<td class="userId" data-value="${expense.userId}">${expense.username}</td><td class="dateSubmitted" data-value="${expense.dateSubmitted}">${date}</td>`;
         tableData += `<td class="amount" data-value="${amount}">${formatAmount(amount)}</td><td class="status" data-value="${statusValue[expense.status]}">${expense.status}</td></tr>`;
     }
     document.getElementById("expense-data").innerHTML += tableData;
@@ -98,6 +101,7 @@ async function getAllExpenses() {
     });
     const expenseBody = await expenseHeader.json();
     document.getElementById("expense-data").innerHTML = "";
+    document.getElementById("expense-details").innerHTML = "";
     populateTable(expenseBody);
     document.getElementById("all-expenses").hidden = true;
 }
@@ -132,7 +136,15 @@ async function resolveExpense() {
     document.getElementById("resolve-form").hidden = true;
     updated.username = document.getElementById("full-expense-owner").dataset.name;
     renderFullExpense(updated);
-    populateTable([updated]);
+    populateTable([updated], true);
+    const stats = document.getElementById("stats-summary").dataset;
+    if(newStatus === "APPROVED") {
+        stats.approvedCount = Number(stats.approvedCount)+1;
+        stats.totalReimbursed = Number(stats.totalReimbursed)+Number(document.getElementById("expense-details").dataset.amount);
+    } else {
+        stats.deniedCount = Number(stats.deniedCount)+1;
+    }
+    calculateStats(stats);
 }
 
 async function addExpense(event) {
@@ -154,12 +166,14 @@ async function addExpense(event) {
         "amountInCents":Math.round(amount*100),
         "reasonSubmitted":description
     };
+    /*
     const filePath = document.getElementById("file-upload").files[0];
     if(filePath) {
         const url = await uploadFile(filePath);
         bodyJSON.fileURL = url;
         document.getElementById("file-upload").value = "";
     }
+    */
     const expenseHeader = await fetch(base+"/users/expense", {
         method:"POST",
         headers:{
@@ -170,7 +184,7 @@ async function addExpense(event) {
     });
     const newExpense = await expenseHeader.json();
     newExpense.username = userInfo.username;
-    populateTable([newExpense]);
+    populateTable([newExpense], true);
     renderFullExpense(newExpense);
 }
 
@@ -202,12 +216,14 @@ async function updateExpense(event) {
         "amountInCents":amount*100,
         "reasonSubmitted":reason
     };
+    /*
     const filePath = document.getElementById("edit-file-upload").files[0];
     if(filePath) {
         const url = await uploadFile(filePath);
         bodyJSON.fileURL = url;
         document.getElementById("edit-file-upload").value = "";
     }
+    */
     const httpRequest = await fetch(base+`/users/expense/${expenseId}`,{
         method:"PUT",
         headers:{
@@ -219,7 +235,7 @@ async function updateExpense(event) {
     const response = await httpRequest.json();
     response.username = userInfo.username;
     document.getElementById(`expense-${expenseId}`).remove();
-    populateTable([response]);
+    populateTable([response], true);
     renderFullExpense(response);
     document.getElementById("edit-expense").hidden = true;
     document.getElementById("start-edit").innerText = "Edit Expense"
@@ -293,25 +309,38 @@ async function getMangerStats() {
         }
     });
     const stats = await httpRequest.json();
-    const displayBox = document.getElementById("stats-display");
-    displayBox.hidden=false;
-    const displayList = document.getElementById("stats-summary");
-    if((stats.deniedCount + stats.approvedCount) === 0) {
-        displayBox.innerHTML += `<h6>You haven't resolved any expenses</h6>`;
-        return;
-    }
-    let display = `<li>Total Resolved Expenses: ${stats.deniedCount + stats.approvedCount}</li>`;
-    display+= `<li>Total Approved: ${stats.approvedCount} (${formatPercent(stats.approvedCount/(stats.approvedCount + stats.deniedCount))})</li>`;
-    display+= `<li>Total Denied: ${stats.deniedCount} (${formatPercent(stats.deniedCount/(stats.approvedCount + stats.deniedCount))})</li>`;
-    display+= `<li>Total Reimbursed: ${formatAmount(stats.totalReimbursed/100)}</li>`;
-    displayList.innerHTML = display;
+    calculateStats(stats);
 }
-
+/*
 async function uploadFile(path) {
     let formData = new FormData();
     formData.append("file", path);
     const httpRequest = await fetch(base+"/users/upload", {method:"POST", headers:{"Authorization":userInfo.jwt},body:formData});
     const response = await httpRequest.text();
+    console.log(response);
     return response;
+}
+*/
+function calculateStats(stats) {
+    const displayBox = document.getElementById("stats-display");
+    displayBox.hidden=false;
+    const displayList = document.getElementById("stats-summary");
+    displayList.dataset.approvedCount = stats.approvedCount;
+    displayList.dataset.deniedCount = stats.deniedCount;
+    displayList.dataset.totalReimbursed = stats.totalReimbursed;
+    if((stats.deniedCount + stats.approvedCount) === 0) {
+        displayBox.innerHTML += `<h6>You haven't resolved any expenses</h6>`;
+        return;
+    }
+    let display = `<li>Total Resolved Expenses: ${Number(stats.deniedCount) + Number(stats.approvedCount)}</li>`;
+    display+= `<li>Total Approved: ${stats.approvedCount} (${formatPercent(Number(stats.approvedCount)/(Number(stats.approvedCount) + Number(stats.deniedCount)))})</li>`;
+    display+= `<li>Total Denied: ${stats.deniedCount} (${formatPercent(Number(stats.deniedCount)/(Number(stats.approvedCount) + Number(stats.deniedCount)))})</li>`;
+    display+= `<li>Total Reimbursed: ${formatAmount(Number(stats.totalReimbursed)/100)}</li>`;
+    displayList.innerHTML = display;
+}
+
+function logout() {
+    sessionStorage.removeItem("userInfo");
+    window.location.assign("file:///C:/Users/Josh/IdeaProjects/BartProject1/frontend/page.html");
 }
 populatePage();

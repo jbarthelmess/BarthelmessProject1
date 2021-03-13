@@ -41,7 +41,7 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
     @Override
     public User getUser(User user) {
         try(Connection conn = ConnectionUtil.createConnection()) {
-            String query = "select * from users natural join expense where username = ?";
+            String query = "select expense.*, users.username from users natural join expense where username = ?";
             PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1,user.getUsername());
             ResultSet rs = ps.executeQuery();
@@ -59,6 +59,7 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
                 expense.setUserId(user.getUserId());
                 expense.setManagerHandler(rs.getInt("manager_handler"));
                 expense.setFileURL(rs.getString("file_url"));
+                expense.setUsername(rs.getString("username"));
                 expenses.add(expense);
             }
             user.setMyExpenses(expenses);
@@ -99,7 +100,7 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
     @Override
     public Set<Expense> getAllExpenses() {
         try (Connection conn = ConnectionUtil.createConnection()) {
-            String query = "select * from expense";
+            String query = "select expense.*, users.username from users natural join expense";
             PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
             Set<Expense> expenses = new HashSet<>();
@@ -115,6 +116,7 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
                 expense.setUserId(rs.getInt("user_id"));
                 expense.setManagerHandler(rs.getInt("manager_handler"));
                 expense.setFileURL(rs.getString("file_url"));
+                expense.setUsername(rs.getString("username"));
                 expenses.add(expense);
             }
             return expenses;
