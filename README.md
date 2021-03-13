@@ -1,9 +1,9 @@
 # BartProject1
 
-##Dependencies
+## Dependencies
 0. As written, code relies on a PostgreSQL Database server, all other services are built when installed
 
-##Installation Instructions
+## Installation Instructions
 0. Build using `gradlew fatJar` in the commandline
 0. Upload to Server which contains java 
 0. Export environment variables
@@ -13,8 +13,8 @@
 0. Change variable `base` in `login.js` and `landing.js` to `http://VirtualMachineIPAddress:7000`
 0. Put all files in `frontend` in a public bucket and change references in `login.js` and `landing.js` to public URLs
 
-##API Notes
-####Endpoints
+## API Notes
+#### Endpoints
 * `POST /users/login` - login as a user
 * `GET /users` - get User Info
 * `GET /users/expense/:id` - get full details for expense with given id
@@ -22,7 +22,7 @@
 * `POST /users/expense` - create new expense
 * `PUT /users/expense/:id` - update expense with given id
 * `GET /users/stats` - get statistics for a manager (MANAGERS ONLY)
-####Notes about endpoints
+#### Notes about endpoints
 - All endpoints (except `login`) require a JWT included in the headers of every request under the `Authorization` heading
 - Login will return the user a JWT on a successful login which ought to be used in every request
 - Update expense has rules about how expenses can be updated by users
