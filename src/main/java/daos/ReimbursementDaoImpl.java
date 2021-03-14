@@ -58,7 +58,7 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
                 expense.setAmountInCents(rs.getInt("amount_cents"));
                 expense.setUserId(user.getUserId());
                 expense.setManagerHandler(rs.getInt("manager_handler"));
-                expense.setFileURL(rs.getString("file_url"));
+                //expense.setFileURL(rs.getString("file_url"));
                 expense.setUsername(rs.getString("username"));
                 expenses.add(expense);
             }
@@ -88,7 +88,7 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
             expense.setAmountInCents(rs.getInt("amount_cents"));
             expense.setUserId(rs.getInt("user_id"));
             expense.setManagerHandler(rs.getInt("manager_handler"));
-            expense.setFileURL(rs.getString("file_url"));
+            //expense.setFileURL(rs.getString("file_url"));
             expense.setUsername(rs.getString("username"));
             return expense;
         } catch (SQLException s) {
@@ -115,7 +115,7 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
                 expense.setAmountInCents(rs.getInt("amount_cents"));
                 expense.setUserId(rs.getInt("user_id"));
                 expense.setManagerHandler(rs.getInt("manager_handler"));
-                expense.setFileURL(rs.getString("file_url"));
+                //expense.setFileURL(rs.getString("file_url"));
                 expense.setUsername(rs.getString("username"));
                 expenses.add(expense);
             }

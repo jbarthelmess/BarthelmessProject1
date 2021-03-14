@@ -60,7 +60,13 @@ public class ReimbursementServiceImpl implements ReimbursementService{
         if(expense.getAmountInCents()<=0) throw new IllegalArgumentException("Amount should not be less than or equal to zero");
         if(expense.getReasonSubmitted() == null || expense.getReasonSubmitted().equals(""))
             throw new IllegalArgumentException("Reason should not be empty or null");
-        if(expense.getFileURL() != null && expense.getFileURL().equals("")) expense.setFileURL(null);
+        // change if file gets implemented
+        expense.setFileURL(null);
+        // enforce non-start fields
+        expense.setStatus(ExpenseStatus.PENDING);
+        expense.setReasonResolved(null);
+        expense.setDateResolved(0);
+        expense.setManagerHandler(0);
         return dao.createExpense(expense);
     }
 
@@ -94,6 +100,9 @@ public class ReimbursementServiceImpl implements ReimbursementService{
             expense.setManagerHandler(0);
             expense.setReasonResolved(null);
             expense.setDateResolved(0);
+
+            // file cannot be updated as it is not a staying feature, remove if file gets working
+            expense.setFileURL(null);
 
             // update reason, fileURL, amount only if a new one was given, otherwise, keep the old value
             if(expense.getReasonSubmitted() == null || expense.getReasonSubmitted().equals("")) {
