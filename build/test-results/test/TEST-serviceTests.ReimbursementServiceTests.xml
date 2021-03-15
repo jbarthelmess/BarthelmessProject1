@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="serviceTests.ReimbursementServiceTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-03-10T14:28:37" hostname="DESKTOP-T6NR4LV" time="0.009">
+<testsuite name="serviceTests.ReimbursementServiceTests" tests="14" skipped="0" failures="0" errors="0" timestamp="2021-03-15T03:33:04" hostname="DESKTOP-11I12O9" time="16.257">
   <properties/>
-  <testcase name="get_manager_statistics_as_employee()" classname="serviceTests.ReimbursementServiceTests" time="0.009"/>
-  <system-out><![CDATA[]]></system-out>
+  <testcase name="get_user()" classname="serviceTests.ReimbursementServiceTests" time="2.337"/>
+  <testcase name="get_all_expenses()" classname="serviceTests.ReimbursementServiceTests" time="0.936"/>
+  <testcase name="get_all_expenses_illegal_access_exception()" classname="serviceTests.ReimbursementServiceTests" time="0.022"/>
+  <testcase name="get_expense()" classname="serviceTests.ReimbursementServiceTests" time="0.956"/>
+  <testcase name="get_expense_2()" classname="serviceTests.ReimbursementServiceTests" time="0.914"/>
+  <testcase name="get_expense_3()" classname="serviceTests.ReimbursementServiceTests" time="0.931"/>
+  <testcase name="create_expense()" classname="serviceTests.ReimbursementServiceTests" time="0.921"/>
+  <testcase name="update_expense()" classname="serviceTests.ReimbursementServiceTests" time="2.785"/>
+  <testcase name="update_expense_2()" classname="serviceTests.ReimbursementServiceTests" time="0.902"/>
+  <testcase name="update_expense_3()" classname="serviceTests.ReimbursementServiceTests" time="0.907"/>
+  <testcase name="update_expense_4()" classname="serviceTests.ReimbursementServiceTests" time="1.824"/>
+  <testcase name="update_expense_5()" classname="serviceTests.ReimbursementServiceTests" time="1.861"/>
+  <testcase name="get_manager_statistics()" classname="serviceTests.ReimbursementServiceTests" time="0.938"/>
+  <testcase name="get_manager_statistics_as_employee()" classname="serviceTests.ReimbursementServiceTests" time="0.004"/>
+  <system-out><![CDATA[User is not permitted to access all expenses
+User is not permitted to access the indicated expense
+Manager must change status if they are updating another's request.
+ManagerStatistics{totalReimbursed=0, approvedCount=0, deniedCount=2, userId=2}
+]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

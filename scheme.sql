@@ -45,3 +45,14 @@ insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, sta
 insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (7, 2100, 'Teaching Ender to Shoot', 1614467999, 'PENDING');
 insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (8, 10000, 'Being Smarter than Ender', 1614468009, 'PENDING');
 insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (8, 5000, 'Because I am short', 1614468019, 'PENDING');
+
+-- for Postman tests
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (1, 1, 'POSTMAN TEST EXPENSE', 1614467456, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status, dateResolved, manager_handler) values (1, 1, 'POSTMAN TEST EXPENSE', 1614467456, 'APPROVED', 1614467457, 4);
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (1, 1, 'POSTMAN TEST EXPENSE', 1614467456, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (1, 1, 'POSTMAN TEST EXPENSE', 1614467456, 'PENDING');
+
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (2, 1, 'POSTMAN TEST EXPENSE', 1614467456, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status, dateResolved, manager_handler) values (2, 1, 'POSTMAN TEST EXPENSE', 1614467456, 'APPROVED', 1614467457, 4);
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (2, 1, 'POSTMAN TEST EXPENSE', 1614467456, 'PENDING');
+insert into expense (user_id, amount_cents, reason_submitted, dateSubmitted, status) values (2, 1, 'POSTMAN TEST EXPENSE', 1614467456, 'PENDING');

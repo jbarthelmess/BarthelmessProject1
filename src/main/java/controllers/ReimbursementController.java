@@ -34,6 +34,10 @@ public class ReimbursementController {
 
     private User verifyAuthentication(Context ctx) {
         String authorization = ctx.header("Authorization");
+        if(authorization == null) {
+            logger.warn("Attempted access with no verification");
+            return null;
+        }
         DecodedJWT jwt = JwtUtil.isValidJWT(authorization);
         if(jwt == null) {
             logger.warn("Attempted access without verification");
@@ -116,7 +120,7 @@ public class ReimbursementController {
         } catch (IllegalAccessException i) {
             ctx.status(403);
             ctx.result(i.getMessage());
-        } catch (NumberFormatException n) {
+        } catch (IllegalArgumentException n) {
             ctx.status(400);
             ctx.result(n.getMessage());
         }
@@ -165,7 +169,7 @@ public class ReimbursementController {
         } catch (IllegalAccessException i) {
             ctx.status(403);
             ctx.result(i.getMessage());
-        } catch (NumberFormatException n) {
+        } catch (IllegalArgumentException n) {
             ctx.status(400);
             ctx.result(n.getMessage());
         } catch (NullPointerException e) {

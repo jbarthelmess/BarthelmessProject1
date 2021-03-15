@@ -1,8 +1,8 @@
 utilTests/ConnectionUtilTests.java
  utilTests.ConnectionUtilTests
-utilTests/JwtUtilTests.java
- utilTests.JwtUtilTests
 daoTests/ReimbursementDaoTests.java
  daoTests.ReimbursementDaoTests
+utilTests/JwtUtilTests.java
+ utilTests.JwtUtilTests
 serviceTests/ReimbursementServiceTests.java
  serviceTests.ReimbursementServiceTests

@@ -172,6 +172,7 @@ public class ReimbursementDaoImpl implements ReimbursementDAO{
             user.setManager(rs.getBoolean("is_manager"));
             return user;
         } catch (SQLException s) {
+            s.printStackTrace();
             logger.error(s.getMessage());
             return null;
         }
