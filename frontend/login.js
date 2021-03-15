@@ -28,7 +28,14 @@ async function login() {
     try {
         const userData = JSON.parse(userInfo);
         sessionStorage.setItem("userInfo",userInfo);
-        window.location.assign("file:///C:/Users/Josh/IdeaProjects/BartProject1/frontend/landing.html");
+        const location = window.location.href;
+        //console.log(location);
+        const path = location.split("/");
+        //console.log(path);
+        path[path.length-1]="landing.html";
+        const newPath = path.join("/");
+        //console.log(newPath);
+        window.location.assign(newPath);
     } catch(e) {
         alert("Login Attempt failed, please try again");
         return;

@@ -1,7 +1,15 @@
 try {
     userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+    document.title = userInfo.username+"'s Expense Page"
 } catch {
-    window.location.assign("file:///C:/Users/Josh/IdeaProjects/BartProject1/frontend/page.html");
+    const location = window.location.href;
+    //console.log(location);
+    const path = location.split("/");
+    //console.log(path);
+    path[path.length-1]="page.html";
+    const newPath = path.join("/");
+    //console.log(newPath);
+    window.location.assign(newPath);
 }
 //base = "http://localhost:7000";
 base = "http://35.202.96.201:7000";
@@ -77,6 +85,11 @@ function renderFullExpense(fullExpense) {
 /*populates the table */
 function populateTable(expenses=[], highlight=false) {
     let tableData = "";
+    if(highlight) {
+        [...document.getElementsByClassName("selected")].forEach(element =>{
+            element.classList.remove("selected");
+        });
+    }
     for(expense of expenses) {
         const date = formatDate(expense.dateSubmitted);
         const amount = expense.amountInCents/100;
@@ -341,6 +354,13 @@ function calculateStats(stats) {
 
 function logout() {
     sessionStorage.removeItem("userInfo");
-    window.location.assign("file:///C:/Users/Josh/IdeaProjects/BartProject1/frontend/page.html");
+    const location = window.location.href;
+    //console.log(location);
+    const path = location.split("/");
+    //console.log(path);
+    path[path.length-1]="page.html";
+    const newPath = path.join("/");
+    //console.log(newPath);
+    window.location.assign(newPath);
 }
 populatePage();
